@@ -1,0 +1,49 @@
+<!-- <div id="app"></div> -->
+  <!-- 
+    <article class="col-span-2 md:col-span-1 p-4">
+<code data-id="editor" contenteditable="true" class="whitespace-pre-wrap focus:outline-none">export function atom(initialValue) {
+  let value = initialValue;
+  const subscribers = new Set();
+  const read = () => {
+    return value;
+  };
+  const write = (newValueOrFn) => {
+    value = newValueOrFn instanceof Function ? newValueOrFn(value) : newValueOrFn;
+    subscribers.forEach(subscriber => {
+      subscriber()
+  });
+  }
+  const subscribe = (subscriber) => {
+    subscribers.add(subscriber);
+    return () => subscribers.delete(subscriber);
+  }
+
+  return { read, write, subscribe };
+}</code>
+    </article>
+    <article data-id="tree" class="col-span-2 md:col-span-1 overflow-scroll">
+      <code data-id="graph" class="whitespace-pre-wrap"></code> -->
+      <!-- style={{
+            backgroundSize: `calc(${scale} * 20px) calc(${scale} * 20px)`,
+            backgroundPosition: `calc(${scale} - 19px) calc(${scale} - 19px)`,
+            backgroundImage: `radial-gradient(#ddd calc(${scale}*0.5px + 0.5px), transparent 0)`,
+          }}-->
+      <!-- <section data-id="json-canvas" class="h-full w-full relative">
+        <svg data-id="canvas-edges" class="absolute t-0 r-0 w-full h-full">
+          <defs>
+            <marker id="arrowhead" markerWidth="5" markerHeight="4" refX="1" refY="2" orient="auto">
+              <polygon points="0 0, 5 2, 0 4" />
+            </marker>
+          </defs>
+          <g data-id="edge-paths"></g>
+        </svg>
+        <section data-id="canvas-nodes" class="h-full w-full relative"></section>
+        
+      </section> -->
+    <!-- </article> -->
+  <!-- <main class="grid grid-cols-2 w-screen h-screen">
+    <article class="col-span-2 md:col-span-1"></article>
+    <article data-id="tree" class="col-span-2 md:col-span-1 overflow-scroll"></article>
+  </main>
+ -->
+  <!-- <script type="module" src="/src/tree/render.mts"></script> -->
