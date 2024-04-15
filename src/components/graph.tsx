@@ -1,6 +1,6 @@
 import { parse } from "acorn";
 import { D3DragEvent, drag, hierarchy, select, tree } from "d3";
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { getHierarchy } from "../tree/hierachy.mts";
 
 interface GraphProps {
@@ -17,7 +17,6 @@ export function Graph(props: GraphProps) {
     node()?.replaceChildren();
     const ty = translate().y;
     const tx = translate().x;
-    console.log({ tx, ty})
     const dragHandler = drag()
     .on("start", (event) => {
       select(event.sourceEvent.target).classed("dragging", true);
@@ -43,7 +42,7 @@ export function Graph(props: GraphProps) {
 
     const svg = select(node()).append("svg")
                 .attr("width", width + margin.l + margin.r)
-                .attr("height", height + margin.t + margin.b);
+                .attr("height", height + margin.t + margin.b).call(dragHandler as any);;
     const g = svg.append("g").attr("transform",`translate(${margin.l}, ${margin.r})`);
 
     g.selectAll(".link")
@@ -63,8 +62,7 @@ export function Graph(props: GraphProps) {
     .data(nodes.descendants())
     .enter().append("g")
     .attr("class", node => `node fill-red ${node.children ? "node--internal" : "node--leaf"}`)
-    .attr("transform", node => `translate(${node.x! + tx},${node.y! + ty})`)
-    .call(dragHandler as any);
+    .attr("transform", node => `translate(${node.x! + tx},${node.y! + ty})`);
     gnode.append("circle")
     .attr("r", 10);
     gnode.append("text")
@@ -74,5 +72,7 @@ export function Graph(props: GraphProps) {
     .text(node => node.data.name);
   })
 
-  return (<article ref={setNode} class="col-span-2 md:col-span-1 overflow-scroll" />);
+  return (<article class="col-span-2 md:col-span-1 overflow-scroll">
+    <div class="w-full h-full" ref={setNode} />
+  </article>);
 }
