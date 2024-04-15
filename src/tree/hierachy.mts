@@ -1,94 +1,83 @@
 import type { Program, AnyNode, VariableDeclarator } from "acorn"
-import { match_node } from "../utils/match.mts";
-import { children } from "solid-js/types/server/reactive.js";
 
 type HierarchyAstNode = { name: string; children?: Array<HierarchyAstNode> };
-
-export function getHierarchy(program: Program) {
-  const visitNode = (node: AnyNode | VariableDeclarator): HierarchyAstNode => {
-    return match_node<HierarchyAstNode>({
-      FunctionDeclaration(node){
-        return {
-          name: node.type,
-          children: node.body.body.map(node => visitNode(node))
-        }
-      },
-      ReturnStatement(node){
-        return {
-          name: node.type,
-          children: [{ name: node.argument?.type!, children: node.argument? [visitNode(node.argument)] : [] }]
-        }
-      },
-      VariableDeclaration(node){
-        return {
-          name: node.type,
-          children: node.declarations.map(node => visitNode(node))
-        }
-      },
-      VariableDeclarator(node){
-        return {
-          name: node.type,
-          // children: node.body.body.map(node => visitNode(node))
-        }
-      },
-      Literal(node){
-        return {
-          name: node.type,
-          // children: node.body.body.map(node => visitNode(node))
-        }
-      },
-      BlockStatement(node) {
-        return {
-          name: node.type,
-          children: node.body.map(node => visitNode(node))
-        }
-      },
-      TemplateLiteral(node) {
-        // const data = {
-        //   label: node.type,
-        //   content: node.type
-        // };
-        // [...node.quasis,...node.expressions].sort((a,b) => a.start - b.start).forEach((node, i) => visitNode(node, parent, level + 1, i));
-        // return data
-        return {
-          name: node.type,
-          children: [...node.quasis,...node.expressions].sort((a,b) => a.start - b.start).map(node => visitNode(node))
-        }
-      },
-      TemplateElement(node) {
-        return {
-          name: node.type,
-          // children: node.body.map(node => visitNode(node))
-        }
-      },
-      Identifier(node) {
-        return {
-          name: node.type,
-          // children: node.body.map(node => visitNode(node))
-        }
-      },
-      ExportNamedDeclaration(node) {
-        console.log({node});
-        return {
-          name: node.type,
-          children: [visitNode(node.declaration!)]
-        }
-      },
-      ObjectExpression(node) {
-        return {
-          name: node.type,
-          children: node.properties.map(property => visitNode(property))
-        }
-      },
-      Property(node) {
-        return {
-          name: node.type
-        }
+const visitNode = (node: AnyNode | VariableDeclarator): HierarchyAstNode => {
+  switch (node.type) {
+    case "FunctionDeclaration":
+      return {
+        name: node.type,
+        children: node.body.body.map(node => visitNode(node))
       }
-    }, node, { name: node.type, children: [] });
+    case "ReturnStatement":
+      return {
+        name: node.type,
+        children: [{ name: node.argument?.type!, children: node.argument ? [visitNode(node.argument)] : [] }]
+      }
+
+    case "VariableDeclaration":
+      return {
+        name: node.type,
+        children: node.declarations.map(node => visitNode(node))
+      }
+
+    case "VariableDeclarator":
+      return {
+        name: node.type,
+        // children: node.body.body.map(node => visitNode(node))
+      }
+
+    case "Literal":
+      return {
+        name: node.type,
+        // children: node.body.body.map(node => visitNode(node))
+      }
+
+    case "BlockStatement":
+      return {
+        name: node.type,
+        children: node.body.map(node => visitNode(node))
+      }
+
+    case "TemplateLiteral":
+      return {
+        name: node.type,
+        children: [...node.quasis, ...node.expressions].sort((a, b) => a.start - b.start).map(node => visitNode(node))
+      }
+
+    case "TemplateElement":
+      return {
+        name: node.type,
+        // children: node.body.map(node => visitNode(node))
+      }
+
+    case "Identifier":
+      return {
+        name: node.type,
+        // children: node.body.map(node => visitNode(node))
+      }
+
+    case "ExportNamedDeclaration":
+      console.log({ node });
+      return {
+        name: node.type,
+        children: [visitNode(node.declaration!)]
+      }
+
+    case "ObjectExpression":
+      return {
+        name: node.type,
+        children: node.properties.map(property => visitNode(property))
+      }
+
+    case "Property":
+      return {
+        name: node.type
+      }
+    default:
+      return { name: node.type, children: [] }
   }
-
-
+}
+export function getHierarchy(program: Program) {
   return {
     name: program.type,
     children: program.body.map(node => visitNode(node))
