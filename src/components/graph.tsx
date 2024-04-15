@@ -11,6 +11,7 @@ const margin = { t: 20, b: 20, l: 40, r: 40 };
 
 export function Graph(props: GraphProps) {
   const [translate, setTranslate] = createSignal<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [dragging, setDragging] = createSignal(false);
   const [node, setNode] = createSignal<HTMLDivElement | null>(null)
 
   createEffect(() => {
@@ -19,13 +20,13 @@ export function Graph(props: GraphProps) {
     const tx = translate().x;
     const dragHandler = drag()
     .on("start", (event) => {
-      select(event.sourceEvent.target).classed("dragging", true);
+      setDragging(() => true);
     })
     .on("drag", (event: D3DragEvent<any, any, any>) => {
       setTranslate(t => ({ x: t.x + event.dx, y: t.y + event.dy }));
     })
     .on("end", (event) => {
-      select(event.sourceEvent.target).classed("dragging", false);
+      setDragging(() => false);
     })
 
     const width = node()?.clientWidth ?? 0 + margin.l + margin.r
@@ -78,6 +79,6 @@ export function Graph(props: GraphProps) {
   })
 
   return (<article class="col-span-2 md:col-span-1 overflow-scroll">
-    <div class="w-full h-full" ref={setNode} />
+    <div classList={{"w-full h-full": true, "cursor-grabbing": dragging(), "cursor-grab": !dragging()}} ref={setNode} />
   </article>);
 }
