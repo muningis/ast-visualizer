@@ -19,13 +19,13 @@ export function Graph(props: GraphProps) {
     const ty = translate().y;
     const tx = translate().x;
     const dragHandler = drag()
-    .on("start", (event) => {
+    .on("start", () => {
       setDragging(() => true);
     })
     .on("drag", (event: D3DragEvent<any, any, any>) => {
       setTranslate(t => ({ x: t.x + event.dx, y: t.y + event.dy }));
     })
-    .on("end", (event) => {
+    .on("end", () => {
       setDragging(() => false);
     })
 
