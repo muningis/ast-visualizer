@@ -1,7 +1,12 @@
 import { codeToHtml } from "shiki/bundle/web";
 import { createSignal, onMount } from "solid-js";
 
-const INITIAL_CONTENT = `const foo = "bar";`;
+const INITIAL_CONTENT = `const foo = "bar";
+function hello() {
+  const greeting = "world!";
+  return \`Hello, \${greeting}!\`;
+}
+`;
 
 interface EditorProps {
   setProgram(setter: () => string): void

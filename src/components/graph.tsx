@@ -69,7 +69,12 @@ export function Graph(props: GraphProps) {
     .attr("dy", ".35em")
     .attr("y", node => node.children ? -20 : 20)
     .style("text-anchor", "middle")
-    .text(node => node.data.name);
+    .text(node => node.data.type);
+    gnode.append("text")
+    .attr("dy", "1.35em")
+    .attr("y", node => node.children ? -20 : 20)
+    .style("text-anchor", "middle")
+    .text(node => node.data.value!);
   })
 
   return (<article class="col-span-2 md:col-span-1 overflow-scroll">
