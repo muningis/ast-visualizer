@@ -37,7 +37,7 @@ export function Graph(props: GraphProps) {
       ast = parse("", { ecmaVersion: "latest", sourceType: "module" });
     }
     const nodes = hierarchy(getHierarchy(ast));
-    const treemap = tree().size([width, height])
+    const treemap = tree().size([width, height - 200])
     const treemap_nodes = treemap(nodes as any);
 
     const svg = select(node()).append("svg")

@@ -1,5 +1,6 @@
 import type { Program, AnyNode, VariableDeclarator } from "acorn"
 import { match_node } from "../utils/match.mts";
+import { children } from "solid-js/types/server/reactive.js";
 
 type HierarchyAstNode = { name: string; children?: Array<HierarchyAstNode> };
 
@@ -84,7 +85,7 @@ export function getHierarchy(program: Program) {
           name: node.type
         }
       }
-    }, node);
+    }, node, { name: node.type, children: [] });
   }
 
 
