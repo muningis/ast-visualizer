@@ -18,6 +18,7 @@ function App() {
       <footer class="h-8 bg-slate-300 p-1">
         Built with: 
         <a class="underline" target="_blank" referrerpolicy="origin" href="https://www.solidjs.com/">Solid</a>, 
+        <a class="underline" target="_blank" referrerpolicy="origin" href="https://d3js.org">d3</a>, 
         <a class="underline" target="_blank" referrerpolicy="origin" href="https://github.com/acornjs/acorn">Acorn</a>, 
         <a class="underline" target="_blank" referrerpolicy="origin" href="https://tailwindcss.com/">Tailwind</a>, 
         <a class="underline" target="_blank" referrerpolicy="origin" href="https://vitejs.dev/">Vite</a>, 
