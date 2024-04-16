@@ -27,7 +27,7 @@ export function Graph(props: GraphProps) {
     const width = node()?.clientWidth ?? 0 + margin.l + margin.r
     const height = node()?.clientHeight ?? 0 + margin.t + margin.b
     const treemap = tree().size([width, height - 200])
-    return treemap(nodes as any);
+    return treemap(nodes() as any);
   })
 
   createEffect(() => {
