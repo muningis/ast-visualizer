@@ -1,6 +1,6 @@
 import { parse } from "acorn";
 import { D3DragEvent, drag, hierarchy, select, tree } from "d3";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 import { getHierarchy } from "../tree/hierachy.mts";
 
 interface GraphProps {
@@ -13,6 +13,22 @@ export function Graph(props: GraphProps) {
   const [translate, setTranslate] = createSignal<{ x: number; y: number }>({ x: 0, y: 0 });
   const [dragging, setDragging] = createSignal(false);
   const [node, setNode] = createSignal<HTMLDivElement | null>(null)
+
+  const nodes = createMemo(() => {
+    let ast;
+    try {
+      ast = parse(props.program, { ecmaVersion: "latest", sourceType: "module" })
+    } catch (ex) {
+      ast = parse("", { ecmaVersion: "latest", sourceType: "module" });
+    }
+    return hierarchy(getHierarchy(ast));
+  });
+  const treemap_nodes = createMemo(() => {
+    const width = node()?.clientWidth ?? 0 + margin.l + margin.r
+    const height = node()?.clientHeight ?? 0 + margin.t + margin.b
+    const treemap = tree().size([width, height - 200])
+    return treemap(nodes as any);
+  })
 
   createEffect(() => {
     node()?.replaceChildren();
@@ -47,7 +63,7 @@ export function Graph(props: GraphProps) {
     const g = svg.append("g").attr("transform",`translate(${margin.l}, ${margin.r})`);
 
     g.selectAll(".link")
-    .data(treemap_nodes.descendants().slice(1))
+    .data(treemap_nodes().descendants().slice(1))
     .enter().append("path")
     .attr("class", "link")
     // .attr("d", (node) =>`M ${(node.x as any)} , ${(node.y as any)} C ${(node.x as any)} , ${(node.y as any) + (node.parent as any).y  / 2} ${(node.parent as any).x} , ${(node.y as any) + (node.parent as any).y / 2} ${(node.x as any)} , ${(node.parent as any).y}`);
@@ -60,7 +76,7 @@ export function Graph(props: GraphProps) {
     .attr("class", "fill-none stroke stroke-black");
 
   const gnode = g.selectAll(".node")  
-    .data(nodes.descendants())
+    .data(nodes().descendants())
     .enter().append("g")
     .attr("class", node => `node fill-red ${node.children ? "node--internal" : "node--leaf"}`)
     .attr("transform", node => `translate(${node.x! + tx},${node.y! + ty})`);
