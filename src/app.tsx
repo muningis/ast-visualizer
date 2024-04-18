@@ -12,8 +12,8 @@ function App() {
   return (
     <div class="flex flex-col w-screen h-screen ">
       <main class="grid grid-cols-2 flex-1 max-h-[calc(100%-2rem)]">
-        <Graph program={program()} />
         <Editor setProgram={setProgram} />
+        <Graph program={program()} />
       </main>
       <footer class="h-8 bg-slate-300 p-1">
         Built with: 

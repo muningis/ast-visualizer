@@ -5,5 +5,7 @@ export interface HierarchyAstNode {
   name?: string;
   /** Defines value of a statement */
   value?: string;
+  /** Meta information */
+  meta?: Record<string, string | number | boolean>
   children?: Array<HierarchyAstNode>
 };

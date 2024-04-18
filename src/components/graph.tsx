@@ -47,15 +47,6 @@ export function Graph(props: GraphProps) {
 
     const width = node()?.clientWidth ?? 0 + margin.l + margin.r
     const height = node()?.clientHeight ?? 0 + margin.t + margin.b
-    let ast;
-    try {
-      ast = parse(props.program, { ecmaVersion: "latest", sourceType: "module" })
-    } catch (ex) {
-      ast = parse("", { ecmaVersion: "latest", sourceType: "module" });
-    }
-    const nodes = hierarchy(getHierarchy(ast));
-    const treemap = tree().size([width, height - 200])
-    const treemap_nodes = treemap(nodes as any);
 
     const svg = select(node()).append("svg")
                 .attr("width", width + margin.l + margin.r)
@@ -91,7 +82,14 @@ export function Graph(props: GraphProps) {
     .attr("dy", "1.35em")
     .attr("y", node => node.children ? -20 : 20)
     .style("text-anchor", "middle")
+    .attr("class", "fill-red-400")
     .text(node => node.data.value!);
+    gnode.append("text")
+    .attr("dy", "2.35em")
+    .attr("y", node => node.children ? -20 : 20)
+    .style("text-anchor", "middle")
+    .attr("class", node => `fill-red-400 ${!("meta" in node.data) ? "hidden" : ""}`)
+    .text(node => JSON.stringify(node.data.meta));
   })
 
   return (<article class="col-span-2 md:col-span-1 overflow-scroll">
