@@ -1,6 +1,6 @@
-import { parse } from "acorn";
+import { parse, tokenizer } from "acorn";
 import { D3DragEvent, drag, hierarchy, select, tree } from "d3";
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal, onMount } from "solid-js";
 import { getHierarchy } from "../tree/hierachy.mts";
 
 interface GraphProps {
@@ -12,7 +12,7 @@ const margin = { t: 20, b: 20, l: 40, r: 40 };
 export function Graph(props: GraphProps) {
   const [translate, setTranslate] = createSignal<{ x: number; y: number }>({ x: 0, y: 0 });
   const [dragging, setDragging] = createSignal(false);
-  const [node, setNode] = createSignal<HTMLDivElement | null>(null)
+  const [node, setNode] = createSignal<HTMLDivElement | null>(null);
 
   const nodes = createMemo(() => {
     let ast;
@@ -21,14 +21,28 @@ export function Graph(props: GraphProps) {
     } catch (ex) {
       ast = parse("", { ecmaVersion: "latest", sourceType: "module" });
     }
+    console.log(ast);
+    console.log([...tokenizer(props.program, { ecmaVersion: "latest", sourceType: "module" })])
     return hierarchy(getHierarchy(ast));
   });
-  const treemap_nodes = createMemo(() => {
-    const width = node()?.clientWidth ?? 0 + margin.l + margin.r
-    const height = node()?.clientHeight ?? 0 + margin.t + margin.b
+  const [treemap_nodes, set_treemap_nodes] = createSignal((() => {
+    const width = (node()?.clientWidth ?? 0) + margin.l + margin.r
+    const height = (node()?.clientHeight ?? 0) + margin.t + margin.b
     const treemap = tree().size([width, height - 200])
     return treemap(nodes() as any);
-  })
+  })());
+  onMount(() => {
+    const width = (node()?.clientWidth ?? 0) + margin.l + margin.r
+    const height = (node()?.clientHeight ?? 0) + margin.t + margin.b
+    const treemap = tree().size([width, height - 200]);
+    set_treemap_nodes(treemap(nodes() as any) as any);
+  });
+  createEffect(() => {
+    const width = (node()?.clientWidth ?? 0) + margin.l + margin.r
+    const height = (node()?.clientHeight ?? 0) + margin.t + margin.b
+    const treemap = tree().size([width, height - 200]);
+    set_treemap_nodes(treemap(nodes() as any) as any);
+  });
 
   createEffect(() => {
     node()?.replaceChildren();
@@ -45,9 +59,8 @@ export function Graph(props: GraphProps) {
       setDragging(() => false);
     })
 
-    const width = node()?.clientWidth ?? 0 + margin.l + margin.r
-    const height = node()?.clientHeight ?? 0 + margin.t + margin.b
-
+    const width = (node()?.clientWidth ?? 0) + margin.l + margin.r
+    const height = (node()?.clientHeight ?? 0) + margin.t + margin.b
     const svg = select(node()).append("svg")
                 .attr("width", width + margin.l + margin.r)
                 .attr("height", height + margin.t + margin.b).call(dragHandler as any);;
@@ -78,18 +91,6 @@ export function Graph(props: GraphProps) {
     .attr("y", node => node.children ? -20 : 20)
     .style("text-anchor", "middle")
     .text(node => node.data.type);
-    gnode.append("text")
-    .attr("dy", "1.35em")
-    .attr("y", node => node.children ? -20 : 20)
-    .style("text-anchor", "middle")
-    .attr("class", "fill-red-400")
-    .text(node => node.data.value!);
-    gnode.append("text")
-    .attr("dy", "2.35em")
-    .attr("y", node => node.children ? -20 : 20)
-    .style("text-anchor", "middle")
-    .attr("class", node => `fill-red-400 ${!("meta" in node.data) ? "hidden" : ""}`)
-    .text(node => JSON.stringify(node.data.meta));
   })
 
   return (<article class="col-span-2 md:col-span-1 overflow-scroll">

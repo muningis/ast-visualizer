@@ -1,14 +1,11 @@
 import { render } from "solid-js/web";
 import { Editor } from "./components/editor";
 import { Graph } from "./components/graph";
-import { createEffect, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import "./style.css"
 
 function App() {
   const [program, setProgram] = createSignal("");
-  createEffect(() => {
-    console.log(program());
-  })
   return (
     <div class="flex flex-col w-screen h-screen ">
       <main class="grid grid-cols-2 flex-1 max-h-[calc(100%-2rem)]">
