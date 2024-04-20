@@ -4,7 +4,6 @@ import { flattenData } from "../tree/hierachy.mts";
 import { OrgChart } from "d3-org-chart";
 import { NodeCard } from "./node_card";
 import { AstNode } from "../tree/types.mts";
-import { render } from "solid-js/web";
 
 interface GraphProps {
   program: string;
