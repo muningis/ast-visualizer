@@ -9,6 +9,8 @@ export interface AstNode {
   name?: string;
   /** Defines value of a statement */
   value?: string;
+  /** Defines operator */
+  operator?: string;
   /** Meta information */
-  // meta?: Record<string, string | number | boolean>
+  meta?: Record<string, string>
 };

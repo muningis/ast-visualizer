@@ -3,9 +3,14 @@ import { createSignal, onMount } from "solid-js";
 import { withDebounce } from "../lib/debounce.mts";
 
 const INITIAL_CONTENT = `const foo = "bar";
+const a = 1 > 2 ? 3 : 4;
 function hello() {
   const greeting = "world!";
   return \`Hello, \${greeting}!\`;
+}
+
+if (true) {
+  console.log("hello");
 }
 `;
 

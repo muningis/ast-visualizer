@@ -5,10 +5,10 @@ import { nanoid } from "nanoid";
 export function visitNodes(nodes: Array<AnyNode | VariableDeclarator | null>, parentId: string): AstNode[] {
   return nodes.flatMap(node => visitNode(node, parentId));
 }
-export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: string): AstNode[] {
+export function visitNode(node: AnyNode | VariableDeclarator | null | undefined, parentId: string, meta?: Record<string, string>): AstNode[] {
   const id = nanoid();
   if (!node) return [];
-  const baseNode = { id, parentId, type: node.type}
+  const baseNode = { id, parentId, type: node.type, meta };
   switch (node.type) {
     case "ArrayExpression":
       return [baseNode, ...visitNodes(node.elements, id)];
@@ -25,7 +25,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: s
       return [baseNode, ...visitNode(node.argument, id)];
     case "BinaryExpression":
       /** @todo */
-      return [baseNode, ...visitNodes([node.left, node.right], id)];
+      return [{...baseNode, operator: node.operator}, ...visitNodes([node.left, node.right], id)];
     case "BlockStatement":
       return [baseNode, ...visitNodes(node.body, id)];
     case 'BreakStatement':
@@ -45,7 +45,13 @@ export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: s
       return [baseNode, ...visitNode(node.body, id)];
     case "ConditionalExpression":
       /** @todo */
-      return [baseNode];
+      // return [baseNode, ...visitNodes([node.test, node.consequent, node.alternate], id)];
+      return [
+        baseNode,
+        ...visitNode(node.test, id),
+        ...visitNode(node.consequent, id, { type: "consequent" }),
+        ...visitNode(node.alternate, id, { type: "alternate" }),
+      ];
     case "ContinueStatement":
       return [baseNode, ...(node.label ? visitNode(node.label, id) : [])];
     case "DebuggerStatement":
@@ -81,7 +87,12 @@ export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: s
       return [{...baseNode, name: node.name }];
     case "IfStatement":
       /** @todo */
-      return [baseNode];
+      return [
+        baseNode,
+        ...visitNode(node.test, id),
+        ...visitNode(node.consequent, id, { type: "consequent" }),
+        ...visitNode(node.alternate, id, { type: "alternate" }),
+      ];
     case "ImportDeclaration":
       return [baseNode, ...visitNodes(node.specifiers, id)];
     case "ImportDefaultSpecifier":
@@ -163,7 +174,12 @@ export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: s
     case "VariableDeclaration":
       return [baseNode, ...visitNodes(node.declarations, id)];
     case "VariableDeclarator":
-      return [{...baseNode, name: getName(node.id), value: getValue(node.init)}];
+      switch (node.init?.type) {
+        case "Literal":
+          return [{...baseNode, name: getName(node.id), value: getValue(node.init)}];
+        default:
+          return [{...baseNode, name: getName(node.id)}, ...visitNode(node.init, id)]
+      }
     case "WhileStatement":
       return [baseNode, ...visitNode(node.body, id)];
     case "WithStatement":
