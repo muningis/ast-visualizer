@@ -1,5 +1,5 @@
 import { codeToHtml } from "shiki/bundle/web";
-import { createSignal, onMount } from "solid-js";
+import { Accessor, createSignal, onMount } from "solid-js";
 import { withDebounce } from "../lib/debounce.mts";
 
 const INITIAL_CONTENT = `const foo = "bar";
@@ -16,6 +16,7 @@ if (true) {
 
 interface EditorProps {
   setProgram(value: string): void
+  editorOpen: Accessor<boolean>;
 }
 
 export function Editor(props: EditorProps) {
@@ -26,11 +27,10 @@ export function Editor(props: EditorProps) {
     const html = await codeToHtml(INITIAL_CONTENT, { lang: "js", theme: "dracula-soft" });
     setHighlighted(() => html);
   })
-  return (<article class="col-span-2 md:col-span-1 relative font-mono">
+  return (<article classList={{"relative font-mono overflow-hidden": true, "col-span-2 md:col-span-1": props.editorOpen()}}>
     <pre class="w-full h-full absolute l-0 r-0 b-t- t-0"> 
       <code
         data-id="editor"
-        // contenteditable={true}
         class="whitespace-pre-wrap focus:outline-none w-full h-full [&>pre.shiki]:h-full [&>pre.shiki]:w-full [&>pre.shiki]:p-4"
         innerHTML={highlighted()}
       ></code>

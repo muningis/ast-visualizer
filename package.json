@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "acorn": "^8.11.3",
+    "class-variance-authority": "0.7.0",
     "d3": "^7.9.0",
     "d3-org-chart": "3.1.1",
     "nanoid": "^5.0.7",

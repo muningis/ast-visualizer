@@ -6,11 +6,12 @@ import "./style.css"
 
 function App() {
   const [program, setProgram] = createSignal("");
+  const [editorOpen, setEditorOpen] = createSignal(true);
   return (
     <div class="flex flex-col w-screen h-screen ">
       <main class="grid grid-cols-2 flex-1 max-h-[calc(100%-2rem)]">
-        <Editor setProgram={setProgram} />
-        <Graph program={program()} />
+        <Editor setProgram={setProgram} editorOpen={editorOpen} />
+        <Graph program={program()} editorOpen={editorOpen} toggleEditor={setEditorOpen} />
       </main>
       <footer class="h-8 bg-slate-300 p-1">
         Built with: 

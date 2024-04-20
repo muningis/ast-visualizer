@@ -1,12 +1,16 @@
 import { parse } from "acorn";
-import { createEffect, createMemo, createSignal, onMount } from "solid-js";
+import { Accessor, Setter, createEffect, createMemo, createSignal, onMount } from "solid-js";
 import { flattenData } from "../tree/hierachy.mts";
 import { OrgChart } from "d3-org-chart";
 import { NodeCard } from "./node_card";
 import { AstNode } from "../tree/types.mts";
+import { Button } from "./button";
+
 
 interface GraphProps {
   program: string;
+  editorOpen: Accessor<boolean>;
+  toggleEditor: Setter<boolean>;
 }
 
 export function Graph(props: GraphProps) {
@@ -30,11 +34,21 @@ export function Graph(props: GraphProps) {
     chart()?.duration(400);
   });
 
+  createEffect(() => {
+    props.editorOpen();
+    if (!chart()) return;
+    chart()!
+      .svgHeight(node()?.clientHeight ?? window.innerHeight - 100)
+      .svgWidth(node()?.clientWidth ?? window.innerWidth / 2)
+      .render();
+  });
+
   onMount(() => {
     const chart = new OrgChart<AstNode>();
 
     chart.container(node() as any as string) // Typings says only string is accepted, but it can also accept HTMLElement :/ 
         .svgHeight(node()?.clientHeight ?? window.innerHeight - 100)
+        .svgWidth(node()?.clientWidth ?? window.innerWidth / 2)
         .setActiveNodeCentered(false)
         .scaleExtent([.25, 2])
         .compact(false)
@@ -51,14 +65,17 @@ export function Graph(props: GraphProps) {
     setChart(() => chart);
   });
 
-  return (<article class="col-span-2 md:col-span-1 relative">
+  return (<article classList={{"col-span-2 relative": true, "md:col-span-1": props.editorOpen()}}>
     <aside class="absolute top-4 left-4 flex gap-2">
-      <button onclick={() => {
+      <Button onclick={() => {
+        props.toggleEditor(o => !o);
+      }} label="Toggle Editor" />
+      <Button onclick={() => {
         chart()?.collapseAll()
-      }}>Collapse All</button>
-      <button onclick={() => {
-        chart()?.expandAll();
-      }}>Expand All</button>
+      }} label="Collapse All" />
+      <Button onclick={() => {
+        chart()?.expandAll()
+      }} label="Expand All" />
     </aside>
     <div classList={{"w-full h-full": true, "cursor-grabbing": false, "cursor-grab": true}} ref={setNode} />
   </article>);
