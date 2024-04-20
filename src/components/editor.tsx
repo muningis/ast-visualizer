@@ -1,5 +1,6 @@
 import { codeToHtml } from "shiki/bundle/web";
 import { createSignal, onMount } from "solid-js";
+import { withDebounce } from "../lib/debounce.mts";
 
 const INITIAL_CONTENT = `const foo = "bar";
 function hello() {
@@ -9,11 +10,12 @@ function hello() {
 `;
 
 interface EditorProps {
-  setProgram(setter: () => string): void
+  setProgram(value: string): void
 }
 
 export function Editor(props: EditorProps) {
-  props.setProgram(() => INITIAL_CONTENT);
+  props.setProgram(INITIAL_CONTENT);
+  const setProgram = withDebounce(props.setProgram, 1000);
   const [highlighted, setHighlighted] = createSignal("");
   onMount(async () => {
     const html = await codeToHtml(INITIAL_CONTENT, { lang: "js", theme: "dracula-soft" });
@@ -29,7 +31,7 @@ export function Editor(props: EditorProps) {
       ></code>
     </pre>
     <textarea class="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4" onInput={async (e) => {
-      props.setProgram(() => e.target.value);
+      setProgram(e.target.value);
       const html = await codeToHtml(e.target.value, { lang: "js", theme: "dracula-soft" });
       setHighlighted(() => html);
     }}>{INITIAL_CONTENT}</textarea>

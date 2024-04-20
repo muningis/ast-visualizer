@@ -11,6 +11,7 @@ interface GraphProps {
 
 export function Graph(props: GraphProps) {
   const [node, setNode] = createSignal<HTMLDivElement | null>(null);
+  const [chart, setChart] = createSignal<OrgChart<AstNode> | null>(null);
 
   const nodes = createMemo(() => {
     let ast;
@@ -30,7 +31,7 @@ export function Graph(props: GraphProps) {
       chart.container(node() as any as string) // Typings says only string is accepted, but it can also accept HTMLElement :/ 
         .data(nodes())
         .nodeWidth(() => 150)
-        .nodeHeight(() => 40)
+        .nodeHeight(() => 60)
         .compactMarginBetween(() => 40)
         .nodeContent((node) => {
           return NodeCard(node.data)
@@ -38,9 +39,15 @@ export function Graph(props: GraphProps) {
         .expandAll()
         .render();
     }
+
+    setChart(() => chart);
   })
 
-  return (<article class="col-span-2 md:col-span-1 overflow-scroll">
+  return (<article class="col-span-2 md:col-span-1 relative">
+    <aside class="absolute top-4 left-4 flex gap-2">
+      <button onclick={() => chart()?.collapseAll()}>Collapse All</button>
+      <button onclick={() => chart()?.expandAll()}>Expand All</button>
+    </aside>
     <div classList={{"w-full h-full": true, "cursor-grabbing": false, "cursor-grab": true}} ref={setNode} />
   </article>);
 }

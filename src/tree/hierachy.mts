@@ -1,4 +1,4 @@
-import type { Program, AnyNode, VariableDeclarator } from "acorn"
+import type { Program, AnyNode, VariableDeclarator, Pattern, Expression } from "acorn"
 import { AstNode } from "./types.mts"
 import { nanoid } from "nanoid";
 
@@ -163,7 +163,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: s
     case "VariableDeclaration":
       return [baseNode, ...visitNodes(node.declarations, id)];
     case "VariableDeclarator":
-      return [{...baseNode, name: JSON.stringify(node.id), value: JSON.stringify(node.init)}];
+      return [{...baseNode, name: getName(node.id), value: getValue(node.init)}];
     case "WhileStatement":
       return [baseNode, ...visitNode(node.body, id)];
     case "WithStatement":
@@ -172,6 +172,25 @@ export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: s
       return [baseNode, ...(node.argument ? visitNode(node.argument, id) : [])];
     default:
       throw new Error(`Unreachable point in #visitNode() with node.type of ${node["type"] as any}`)
+  }
+}
+
+const getName = (id: Pattern): string => {
+  switch (id.type) {
+    case "Identifier":
+      return id.name
+    default:
+      return id.type;
+  }
+}
+
+const getValue = (expression: Expression | null | undefined): string => {
+  if (!expression) return "null"
+  switch (expression?.type) {
+    case "Literal":
+      return expression.raw ?? "";
+    default:
+      return JSON.stringify(expression)
   }
 }
 
