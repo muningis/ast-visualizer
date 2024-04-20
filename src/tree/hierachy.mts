@@ -1,391 +1,180 @@
 import type { Program, AnyNode, VariableDeclarator } from "acorn"
-import { HierarchyAstNode } from "./types.mts"
+import { AstNode } from "./types.mts"
+import { nanoid } from "nanoid";
 
-
-const visitNodes = (nodes: Array<AnyNode | VariableDeclarator | null>): HierarchyAstNode[] => nodes.map(n => visitNode(n));
-const visitNode = (node: AnyNode | VariableDeclarator | null): HierarchyAstNode => {
-  if (node === null) return { type: "Literal" }
+export function visitNodes(nodes: Array<AnyNode | VariableDeclarator | null>, parentId: string): AstNode[] {
+  return nodes.flatMap(node => visitNode(node, parentId));
+}
+export function visitNode(node: AnyNode | VariableDeclarator | null, parentId: string): AstNode[] {
+  const id = nanoid();
+  if (!node) return [];
+  const baseNode = { id, parentId, type: node.type}
   switch (node.type) {
     case "ArrayExpression":
-      return {
-        type: node.type,
-        children: visitNodes(node.elements)
-      };
+      return [baseNode, ...visitNodes(node.elements, id)];
     case "ArrayPattern":
-      return {
-        type: node.type,
-        children: visitNodes(node.elements)
-      };
+      return [baseNode, ...visitNodes(node.elements, id)];
     case "ArrowFunctionExpression":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "AssignmentExpression":
-      return {
-        type: node.type,
-        children: [{
-          type: node.operator,
-          children: visitNodes([
-            node.left,
-            node.right
-          ])
-        }]
-      };
+      /** @todo */
+      return [baseNode, ...visitNodes([node.left, node.right], id)];
     case "AssignmentPattern":
-      return {
-        type: node.type,
-        children: visitNodes([
-          node.left,
-          node.right
-        ])
-      };
+      return [baseNode, ...visitNodes([node.left, node.right], id)];
     case "AwaitExpression":
-      return {
-        type: node.type,
-        children: [
-          visitNode(node.argument)
-        ]
-      };
+      return [baseNode, ...visitNode(node.argument, id)];
     case "BinaryExpression":
-      return {
-        type: node.type,
-        children: [{
-          type: node.operator,
-          children: visitNodes([
-            node.left,
-            node.right
-          ])
-        }]
-      };
+      /** @todo */
+      return [baseNode, ...visitNodes([node.left, node.right], id)];
     case "BlockStatement":
-      return {
-        type: node.type,
-        children: visitNodes(node.body)
-      };
-    case "BreakStatement":
-      return {
-        type: node.type,
-      };
+      return [baseNode, ...visitNodes(node.body, id)];
+    case 'BreakStatement':
+      return [baseNode];
     case "CallExpression":
-      return {
-        type: node.type,
-        children: visitNodes([node.callee, ...node.arguments]),
-      };
+      /** @todo */
+      return [baseNode];
     case "CatchClause":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
-    case 'ChainExpression':
-      return {
-        type: node.type
-      };
+      return [baseNode, ...visitNode(node.body, id)];
+    case "ChainExpression":
+      return [baseNode];
     case "ClassBody":
-      return {
-        type: node.type,
-        children: visitNodes(node.body)
-      };
+      return [baseNode, ...visitNodes(node.body, id)];
     case "ClassDeclaration":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "ClassExpression":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "ConditionalExpression":
-      return {
-        type: node.type,
-        children: [visitNode(node.test), visitNode(node.consequent), visitNode(node.alternate)]
-      };
+      /** @todo */
+      return [baseNode];
     case "ContinueStatement":
-      return { type: node.type, children: node.label ? [visitNode(node.label)] : [] };
+      return [baseNode, ...(node.label ? visitNode(node.label, id) : [])];
     case "DebuggerStatement":
-      return { type: node.type };
+      return [baseNode];
     case "DoWhileStatement":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "EmptyStatement":
-      return { type: node.type };
+      return [baseNode];
     case "ExportAllDeclaration":
-      return {
-        type: node.type,
-        children: node.exported ? [visitNode(node.exported)]: []
-      };
+      return [baseNode, ...(node.exported ? visitNode(node.exported, id): [])];
     case "ExportDefaultDeclaration":
-      return {
-        type: node.type,
-        children: [visitNode(node.declaration)]
-      };
+      return [baseNode, ...visitNode(node.declaration, id)];
     case "ExportNamedDeclaration":
-      console.log({ node });
-      return {
-        type: node.type,
-        children: [visitNode(node.declaration!)]
-      };
+      return [baseNode, ...visitNode(node.declaration!, id)];
     case "ExportSpecifier":
-      return {
-        type: node.type,
-        children: [visitNode(node.exported)]
-      };
+      return [baseNode, ...visitNode(node.exported, id)];
     case "ExpressionStatement":
-      return {
-        type: node.type,
-        children: [visitNode(node.expression)]
-      };
+      return [baseNode, ...visitNode(node.expression, id)];
     case "ForInStatement":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "ForOfStatement":
-      return { type: node.type, children: [visitNode(node.body)] };
+      return [baseNode, ...visitNode(node.body, id)];
     case "ForStatement":
-      return { type: node.type, children: [visitNode(node.body)] };
-    case "FunctionExpression":
-      return { type: node.type, children: [visitNode(node.body)] };
+      return [baseNode, ...visitNode(node.body, id)];
     case "FunctionDeclaration":
-      return {
-        type: node.type,
-        // name: node.id?.name,
-        // meta: {
-        //   async: node.async
-        // },
-        children: [
-          ...(node.id ? [visitNode(node.id)] : []),
-          visitNode(node.body)
-        ]
-      };
+      return [{
+        ...baseNode,
+        name: node.id?.name
+      }, ...visitNode(node.body, id)];
+    case "FunctionExpression":
+      return [baseNode, ...visitNode(node.body, id)];
     case "Identifier":
-      return {
-        type: node.type,
-        // value: node.name
-        // children: node.body.map(node => visitNode(node))
-      };
-    case 'IfStatement':
-      return {
-        type: node.type,
-        children: visitNodes([node.test, node.consequent, ...(node.alternate ? [node.alternate]: [])])
-      };
-    case 'ImportDeclaration':
-      return { type: node.type, children: visitNodes(node.specifiers) };
+      return [{...baseNode, name: node.name }];
+    case "IfStatement":
+      /** @todo */
+      return [baseNode];
+    case "ImportDeclaration":
+      return [baseNode, ...visitNodes(node.specifiers, id)];
     case "ImportDefaultSpecifier":
-      return { type: node.type, children: [visitNode(node.local)] };
+      return [baseNode, ...visitNode(node.local, id)];
     case "ImportExpression":
-      return { type: node.type, children: [visitNode(node.source)] };
+      return [baseNode, ...visitNode(node.source, id)];
     case "ImportNamespaceSpecifier":
-      return { type: node.type, children: [visitNode(node.local)] };
+      return [baseNode, ...visitNode(node.local, id)];
     case "ImportSpecifier":
-      return { type: node.type, children: visitNodes([node.local, node.imported]) };
+      return [baseNode, ...visitNodes([node.local, node.imported], id)];
     case "LabeledStatement":
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "Literal":
-      /**
-       * @todo - display that literal?
-       */
-      return {
-        type: node.type,
-        // value: node.raw,
-        // children: node.body.body.map(node => visitNode(node))
-      };
+      /** @todo - regexes */
+      return [{...baseNode, value: node.raw }];
     case "LogicalExpression":
-      return {
-        type: node.type,
-        children: [{
-          type: node.operator,
-          children: visitNodes([node.left, node.right])
-        }]
-      };
+      /** @todo - show node.operator */
+      return [baseNode, ...visitNodes([node.left, node.right], id)];
     case "MemberExpression":
-      return {
-        type: node.type,
-        children: visitNodes([node.object, node.property]),
-      };
+      return [baseNode, ...visitNodes([node.object, node.property], id)];
     case "MetaProperty":
-      return {
-        type: node.type,
-        children: [visitNode(node.property)]
-      };
+      return [baseNode, ...visitNode(node.property, id)];
     case "MethodDefinition":
-      /**
-       * @todo
-       */
-      return {
-        type: node.type,
-        children: [visitNode(node.value)]
-      };
+      return [baseNode, ...visitNode(node.value, id)];
     case "NewExpression":
-      return {
-        type: node.type,
-        children: visitNodes(node.arguments)
-      };
+      return [baseNode, ...visitNodes(node.arguments, id)];
     case "ObjectExpression":
-      return {
-        type: node.type,
-        children: visitNodes(node.properties)
-      };
+      return [baseNode, ...visitNodes(node.properties, id)];
     case "ObjectPattern":
-      return {
-        type: node.type,
-        children: visitNodes(node.properties)
-      };
+      return [baseNode, ...visitNodes(node.properties, id)];
     case "ParenthesizedExpression":
-      return {
-        type: node.type,
-        children: [visitNode(node.expression)]
-      };
+      return [baseNode, ...visitNode(node.expression, id)];
     case "PrivateIdentifier":
-      /**
-       * @todo
-       */
-      return {
-        type: node.type,
-      };
+      /** @todo */
+      return [baseNode];
     case "Program":
-      return { type: node.type, children: visitNodes(node.body) };
+      return [baseNode, ...visitNodes(node.body, id)];
     case "Property":
-      return {
-        type: node.type,
-        children: visitNodes([
-          node.key,
-          ...(node.value.type !== "Identifier" ? [node.value] : [])
-        ])
-      };
+      /** @todo */
+      return [baseNode, ...visitNodes([
+        node.key,
+        ...(node.value.type !== "Identifier" ? [node.value] : [])
+      ], id)];
     case "PropertyDefinition":
-      return {
-        type: node.type,
-        children: node.value ? [visitNode(node.value)] : []
-      };
+      return [baseNode, ...(node.value ? visitNode(node.value, id) : [])];
     case "RestElement":
-      return {
-        type: node.type,
-        children: [visitNode(node.argument)]
-      };
+      return [baseNode, ...visitNode(node.argument, id)];
     case "ReturnStatement":
-      return {
-        type: node.type,
-        children: [{ type: node.argument?.type!, children: node.argument ? [visitNode(node.argument)] : [] }]
-      };
+      return [baseNode, ...(node.argument ? visitNode(node.argument, id) : [])];
     case "SequenceExpression":
-      return {
-        type: node.type,
-        children: visitNodes(node.expressions)
-      };
+      return [baseNode, ...visitNodes(node.expressions, id)];
     case "SpreadElement":
-      return {
-        type: node.type,
-        children: [visitNode(node.argument)]
-      };
+      return [baseNode, ...visitNode(node.argument, id)];
     case "StaticBlock":
-      return {
-        type: node.type,
-        children: visitNodes(node.body)
-      };
+      return [baseNode, ...visitNodes(node.body, id)];
     case "Super":
-      return { type: node.type };
+      return [baseNode];
     case "SwitchCase":
-      return {
-        type: node.type,
-        children: visitNodes(node.consequent)
-      };
+      /** @todo - add what's the condition */
+      return [baseNode, ...visitNodes(node.consequent, id)];
     case "SwitchStatement":
-      return {
-        type: node.type,
-        children: visitNodes(node.cases)
-      };
+      return [baseNode, ...visitNodes(node.cases, id)];
     case "TaggedTemplateExpression":
-      return {
-        type: node.type,
-        children: visitNodes([node.tag, node.quasi])
-      };
+      return [baseNode, ...visitNodes([node.tag, node.quasi], id)];
     case "TemplateElement":
-      return {
-        type: node.type,
-        // value: node.value.raw
-        // children: node.body.map(node => visitNode(node))
-      };
+      return [{...baseNode, value: node.value.raw}];
     case "TemplateLiteral":
-      return {
-        type: node.type,
-        children: [...node.quasis, ...node.expressions].sort((a, b) => a.start - b.start).map(node => visitNode(node))
-      };
+      return [baseNode, ...([...node.quasis, ...node.expressions].sort((a, b) => a.start - b.start).flatMap(node => visitNode(node, id)))];
     case "ThisExpression":
-      return {
-        type: node.type,
-      };
+      return [baseNode];
     case "ThrowStatement":
-      return {
-        type: node.type,
-        children: [visitNode(node.argument)]
-      };
+      return [baseNode, ...visitNode(node.argument, id)];
     case "TryStatement":
-      return {
-        type: node.type,
-        children: [{
-          type: "TryClause",
-          children: [visitNode(node.block)]
-        }, ...(node.handler ? [visitNode(node.handler)] : []),
-        ...(node.finalizer ? [{ type: 'FinallyClause', children: [visitNode(node.finalizer)] }] : [])]
-      };
+      return [baseNode];
     case "UnaryExpression":
-      return {
-        type: node.type,
-        children: [{
-          type: node.operator,
-          children: [visitNode(node.argument)]
-        }]
-      };
+      return [baseNode];
     case "UpdateExpression":
-      return {
-        type: node.type,
-        children: [{
-          type: node.operator,
-        }, visitNode(node.argument)]
-      };
+      return [baseNode];
     case "VariableDeclaration":
-      return {
-        type: node.type,
-        children: visitNodes(node.declarations)
-      };
+      return [baseNode, ...visitNodes(node.declarations, id)];
     case "VariableDeclarator":
-      return {
-        type: node.type,
-        children: visitNodes([
-          node.id,
-          ...(node.init ? [node.init] : []),
-        ])
-      };
+      return [{...baseNode, name: JSON.stringify(node.id), value: JSON.stringify(node.init)}];
     case "WhileStatement":
-      /**
-       * @todo node.test
-       */
-      return {
-        type: node.type,
-        children: [visitNode(node.body)]
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "WithStatement":
-      /**
-       * @todo node.object
-       */
-      return {
-        type: node.type,
-        children: [visitNode(node.body)],
-      };
+      return [baseNode, ...visitNode(node.body, id)];
     case "YieldExpression":
-      return {
-        type: node.type,
-        children: node.argument ? [visitNode(node.argument)] : undefined
-      };
+      return [baseNode, ...(node.argument ? visitNode(node.argument, id) : [])];
+    default:
+      throw new Error(`Unreachable point in #visitNode() with node.type of ${node["type"] as any}`)
   }
 }
-export function getHierarchy(program: Program): HierarchyAstNode {
-  return visitNode(program);
+
+export function flattenData(program: Program): AstNode[] {
+  return [...visitNode(program, "")]
 }
