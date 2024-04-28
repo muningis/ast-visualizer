@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.shiki code {
+  counter-reset: step;
+  counter-increment: step 0;
+}
+
+.line::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 2.5rem;
+  padding-right: 1rem;
+  display: inline-block;
+  text-align: right;
+  color: #738a9466;
+  position: sticky;
+  left: 0;
+}

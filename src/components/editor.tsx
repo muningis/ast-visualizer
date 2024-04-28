@@ -27,7 +27,7 @@ export function Editor(props: EditorProps) {
     const html = await codeToHtml(INITIAL_CONTENT, { lang: "js", theme: "dracula-soft" });
     setHighlighted(() => html);
   })
-  return (<article classList={{"relative font-mono overflow-hidden": true, "col-span-2 md:col-span-1": props.editorOpen()}}>
+  return (<article class="relative font-mono overflow-hidden">
     <pre class="w-full h-full absolute l-0 r-0 b-t- t-0"> 
       <code
         data-id="editor"
@@ -35,7 +35,7 @@ export function Editor(props: EditorProps) {
         innerHTML={highlighted()}
       ></code>
     </pre>
-    <textarea class="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4" onInput={async (e) => {
+    <textarea class="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4 pl-14 resize-none" onInput={async (e) => {
       setProgram(e.target.value);
       const html = await codeToHtml(e.target.value, { lang: "js", theme: "dracula-soft" });
       setHighlighted(() => html);

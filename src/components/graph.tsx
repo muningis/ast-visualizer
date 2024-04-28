@@ -1,5 +1,5 @@
 import { parse } from "acorn";
-import { Accessor, Setter, createEffect, createMemo, createSignal, onMount } from "solid-js";
+import { Accessor, Setter, createDeferred, createEffect, createMemo, createRenderEffect, createSignal, onMount } from "solid-js";
 import { flattenData } from "../tree/hierachy.mts";
 import { OrgChart } from "d3-org-chart";
 import { NodeCard } from "./node_card";
@@ -34,21 +34,22 @@ export function Graph(props: GraphProps) {
     chart()?.duration(400);
   });
 
-  createEffect(() => {
-    props.editorOpen();
-    if (!chart()) return;
-    chart()!
-      .svgHeight(node()?.clientHeight ?? window.innerHeight - 100)
-      .svgWidth(node()?.clientWidth ?? window.innerWidth / 2)
-      .render();
-  });
-
   onMount(() => {
     const chart = new OrgChart<AstNode>();
+    const n = node();
 
-    chart.container(node() as any as string) // Typings says only string is accepted, but it can also accept HTMLElement :/ 
-        .svgHeight(node()?.clientHeight ?? window.innerHeight - 100)
-        .svgWidth(node()?.clientWidth ?? window.innerWidth / 2)
+    const updateSVGSize = () => {
+      const n = node();
+      if (!chart) return;
+      chart!
+        .svgHeight(n?.clientHeight ?? window.innerHeight - 100)
+        .svgWidth(n?.clientWidth ?? window.innerWidth / 2)
+        .render();
+    };
+
+    chart.container(n as any as string) // Typings says only string is accepted, but it can also accept HTMLElement :/ 
+        .svgHeight(n?.clientHeight ?? window.innerHeight - 100)
+        .svgWidth(n?.clientWidth ?? window.innerWidth / 2)
         .setActiveNodeCentered(false)
         .scaleExtent([.25, 2])
         .compact(false)
@@ -63,9 +64,14 @@ export function Graph(props: GraphProps) {
         .render();
 
     setChart(() => chart);
+    
+    document.querySelector("[data-id=\"main\"]")?.addEventListener("transitionend", () => {
+      updateSVGSize();
+    });
   });
 
-  return (<article classList={{"col-span-2 relative": true, "md:col-span-1": props.editorOpen()}}>
+  return (<article classList={{"relative": true}}>
+    <div classList={{"w-full h-full absolute": true, "cursor-grabbing": false, "cursor-grab": true}} ref={setNode} />
     <aside class="absolute top-4 left-4 flex gap-2">
       <Button onclick={() => {
         props.toggleEditor(o => !o);
@@ -77,6 +83,5 @@ export function Graph(props: GraphProps) {
         chart()?.expandAll()
       }} label="Expand All" />
     </aside>
-    <div classList={{"w-full h-full": true, "cursor-grabbing": false, "cursor-grab": true}} ref={setNode} />
   </article>);
 }

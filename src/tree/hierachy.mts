@@ -32,7 +32,10 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
       return [baseNode];
     case "CallExpression":
       /** @todo */
-      return [baseNode];
+      switch (node.callee.type) {
+        case "Identifier": return [{...baseNode, name: node.callee.name}];
+        default: return [baseNode];
+      }
     case "CatchClause":
       return [baseNode, ...visitNode(node.body, id)];
     case "ChainExpression":
