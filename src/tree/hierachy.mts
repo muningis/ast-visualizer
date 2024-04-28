@@ -8,7 +8,7 @@ export function visitNodes(nodes: Array<AnyNode | VariableDeclarator | null>, pa
 export function visitNode(node: AnyNode | VariableDeclarator | null | undefined, parentId: string, meta?: Record<string, string>): AstNode[] {
   const id = nanoid();
   if (!node) return [];
-  const baseNode = { id, parentId, type: node.type, meta };
+  const baseNode = { id, parentId, type: node.type, meta, content: getContent(node) };
   switch (node.type) {
     case "ArrayExpression":
       return [baseNode, ...visitNodes(node.elements, id)];
@@ -80,10 +80,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
     case "ForStatement":
       return [baseNode, ...visitNode(node.body, id)];
     case "FunctionDeclaration":
-      return [{
-        ...baseNode,
-        content: getContent(node)
-      }, ...visitNode(node.body, id)];
+      return [baseNode, ...visitNode(node.body, id)];
     case "FunctionExpression":
       return [baseNode, ...visitNode(node.body, id)];
     case "Identifier":
@@ -177,7 +174,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
     case "VariableDeclaration":
       return [{...baseNode, content: node.kind}, ...visitNodes(node.declarations, id)];
     case "VariableDeclarator":
-      return [{ ...baseNode, content: getContent(node) }];
+      return [baseNode];
     case "WhileStatement":
       return [baseNode, ...visitNode(node.body, id)];
     case "WithStatement":
@@ -193,10 +190,24 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
   switch (node.type) {
     case "BinaryExpression":
       return `${getContent(node.left)} ${node.operator} ${getContent(node.right)}`
+    case "CallExpression":
+      return `${getContent(node.callee)}()`;
     case "ExpressionStatement":
       return "ExprStmt"
     case "FunctionDeclaration": return `${node.async ? 'async ' : ''}function ${node.id?.name ?? "AnonymousFunction"}()`;
+    case "Identifier": return node.name;
+    case "IfStatement": return `if (${getContent(node.test)})`;
     case "Literal": return node.raw ?? "";
+    case "MemberExpression": return `${getContent(node.object)}.${getContent(node.property)}`
+    case "ReturnStatement": return `return`;
+    case "Program": return node.sourceType;
+    case "TemplateLiteral": return `\`${
+      [...node.quasis, ...node.expressions]
+        .sort((a, b) => a.start - b.start)
+        .flatMap(node => node.type === "TemplateElement" ? getContent(node) : `\$\{${getContent(node)}\}`)
+        .join("")
+    }\``;
+    case "TemplateElement": return node.value.raw;
     case "VariableDeclarator":
       switch (node.init?.type) {
         case "Literal": return `${getName(node.id)} = ${getValue(node.init)}`;
