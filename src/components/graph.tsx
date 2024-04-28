@@ -55,7 +55,7 @@ export function Graph(props: GraphProps) {
         .compact(false)
         .data(nodes())
         .nodeWidth(() => 150)
-        .nodeHeight(() => 60)
+        .nodeHeight(() => 66)
         .compactMarginBetween(() => 40)
         .nodeContent((node) => {
           return NodeCard(node.data)

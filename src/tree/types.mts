@@ -13,4 +13,6 @@ export interface AstNode {
   operator?: string;
   /** Meta information */
   meta?: Record<string, string>
+
+  content?: string;
 };

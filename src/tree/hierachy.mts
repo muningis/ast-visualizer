@@ -27,7 +27,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
       /** @todo */
       return [{...baseNode, operator: node.operator}, ...visitNodes([node.left, node.right], id)];
     case "BlockStatement":
-      return [baseNode, ...visitNodes(node.body, id)];
+      return [{...baseNode, content: "{/* ... */}"}, ...visitNodes(node.body, id)];
     case 'BreakStatement':
       return [baseNode];
     case "CallExpression":
@@ -82,7 +82,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
     case "FunctionDeclaration":
       return [{
         ...baseNode,
-        name: node.id?.name
+        content: getContent(node)
       }, ...visitNode(node.body, id)];
     case "FunctionExpression":
       return [baseNode, ...visitNode(node.body, id)];
@@ -175,14 +175,9 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
     case "UpdateExpression":
       return [baseNode];
     case "VariableDeclaration":
-      return [baseNode, ...visitNodes(node.declarations, id)];
+      return [{...baseNode, content: node.kind}, ...visitNodes(node.declarations, id)];
     case "VariableDeclarator":
-      switch (node.init?.type) {
-        case "Literal":
-          return [{...baseNode, name: getName(node.id), value: getValue(node.init)}];
-        default:
-          return [{...baseNode, name: getName(node.id)}, ...visitNode(node.init, id)]
-      }
+      return [{ ...baseNode, content: getContent(node) }];
     case "WhileStatement":
       return [baseNode, ...visitNode(node.body, id)];
     case "WithStatement":
@@ -193,6 +188,25 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
       throw new Error(`Unreachable point in #visitNode() with node.type of ${node["type"] as any}`)
   }
 }
+
+const getContent = (node: AnyNode | VariableDeclarator): string => {
+  switch (node.type) {
+    case "BinaryExpression":
+      return `${getContent(node.left)} ${node.operator} ${getContent(node.right)}`
+    case "ExpressionStatement":
+      return "ExprStmt"
+    case "FunctionDeclaration": return `${node.async ? 'async ' : ''}function ${node.id?.name ?? "AnonymousFunction"}()`;
+    case "Literal": return node.raw ?? "";
+    case "VariableDeclarator":
+      switch (node.init?.type) {
+        case "Literal": return `${getName(node.id)} = ${getValue(node.init)}`;
+        case "ConditionalExpression": return `${getName(node.id)} = ${getContent(node.init.test)} ? ${getContent(node.init.consequent)} : ${getContent(node.init.alternate)}`
+        default: return "Not Yet Implemented"
+      }
+    default: return "Not Yet Implemented"
+  }
+}
+
 
 const getName = (id: Pattern): string => {
   switch (id.type) {
