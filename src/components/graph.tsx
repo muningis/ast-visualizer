@@ -1,10 +1,10 @@
 import { parse } from "acorn";
 import { Accessor, Setter, createEffect, createMemo, createSignal, onMount } from "solid-js";
-import { flattenData } from "../tree/hierachy.mts";
+import { flattenData } from "../features/ast/hierachy-builder.mts";
 import { OrgChart } from "d3-org-chart";
 import { NodeCard } from "./node_card";
-import { AstNode } from "../tree/types.mts";
-import { Button } from "./button";
+import { AstNode } from "../features/ast/types.mts";
+import { Button } from "./atoms/button";
 
 
 interface GraphProps {

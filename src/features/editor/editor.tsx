@@ -1,6 +1,6 @@
 import { codeToHtml } from "shiki/bundle/web";
 import { Accessor, createSignal, onMount } from "solid-js";
-import { createDebounce } from "../lib/debounce.mts";
+import { createDebounce } from "../../lib/debounce.mts";
 
 const INITIAL_CONTENT = `const foo = "bar";
 const a = 1 > 2 ? 3 : 4;

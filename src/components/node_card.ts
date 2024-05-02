@@ -1,5 +1,5 @@
-import { AstGroup, astGroupByType } from "../tree/ast.mts";
-import { AstNode } from "../tree/types.mts";
+import { AstGroup, astGroupByType } from "../features/ast/ast.mts";
+import { AstNode } from "../features/ast/types.mts";
 
 const headerColorByAstType: Record<AstGroup, string> = {
   Expression: "bg-blue-300",

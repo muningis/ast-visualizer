@@ -1,5 +1,5 @@
 import { render } from "solid-js/web";
-import { Editor } from "./components/editor";
+import { Editor } from "./features/editor/editor";
 import { Graph } from "./components/graph";
 import { createSignal } from "solid-js";
 import "./style.css"
