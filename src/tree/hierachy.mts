@@ -204,7 +204,7 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
     case "TemplateLiteral": return `\`${
       [...node.quasis, ...node.expressions]
         .sort((a, b) => a.start - b.start)
-        .flatMap(node => node.type === "TemplateElement" ? getContent(node) : `\$\{${getContent(node)}\}`)
+        .flatMap(node => node.type === "TemplateElement" ? getContent(node) : `$\{${getContent(node)}}`)
         .join("")
     }\``;
     case "TemplateElement": return node.value.raw;

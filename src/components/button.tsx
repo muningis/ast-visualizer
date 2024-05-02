@@ -24,7 +24,7 @@ interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement>, VariantProp
 
 export function Button(props: ButtonProps) {
   const [defined, rest] = splitProps(props, ["variant", "label"]);
-  
+
   return (
     <button
       class={buttonVariants({ variant: defined.variant })}

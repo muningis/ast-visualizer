@@ -1,6 +1,6 @@
 import { codeToHtml } from "shiki/bundle/web";
 import { Accessor, createSignal, onMount } from "solid-js";
-import { withDebounce } from "../lib/debounce.mts";
+import { createDebounce } from "../lib/debounce.mts";
 
 const INITIAL_CONTENT = `const foo = "bar";
 const a = 1 > 2 ? 3 : 4;
@@ -15,13 +15,15 @@ if (true) {
 `;
 
 interface EditorProps {
-  setProgram(value: string): void
+  setProgram(_value: string): void
   editorOpen: Accessor<boolean>;
 }
 
 export function Editor(props: EditorProps) {
-  props.setProgram(INITIAL_CONTENT);
-  const setProgram = withDebounce(props.setProgram, 1000);
+  onMount(() => {
+    props.setProgram(INITIAL_CONTENT);
+  })
+  const setProgram = createDebounce((value: string) => props.setProgram(value), 1000);
   const [highlighted, setHighlighted] = createSignal("");
   onMount(async () => {
     const html = await codeToHtml(INITIAL_CONTENT, { lang: "js", theme: "dracula-soft" });
@@ -32,8 +34,9 @@ export function Editor(props: EditorProps) {
       <code
         data-id="editor"
         class="whitespace-pre-wrap focus:outline-none w-full h-full [&>pre.shiki]:h-full [&>pre.shiki]:w-full [&>pre.shiki]:p-4"
+        // eslint-disable-next-line solid/no-innerhtml
         innerHTML={highlighted()}
-      ></code>
+       />
     </pre>
     <textarea class="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4 pl-14 resize-none" onInput={async (e) => {
       setProgram(e.target.value);
