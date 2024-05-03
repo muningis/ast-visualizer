@@ -1,16 +1,18 @@
 import { parse } from "acorn";
 import { Accessor, Setter, createEffect, createMemo, createSignal, onMount } from "solid-js";
-import { flattenData } from "../features/ast/hierachy-builder.mts";
+import { flattenData } from "../../features/ast/hierachy-builder.mts";
 import { OrgChart } from "d3-org-chart";
 import { NodeCard } from "./node_card.mts";
-import { AstNode } from "../features/ast/types.mts";
-import { Button } from "./atoms/button";
+import { AstNode } from "../../features/ast/types.mts";
+import { Button } from "../atoms/button";
 
 
 interface GraphProps {
   program: string;
   editorOpen: Accessor<boolean>;
   toggleEditor: Setter<boolean>;
+  rotate(): void;
+  rotation: Accessor<"left" | "top">;
 }
 
 export function Graph(props: GraphProps) {
@@ -34,6 +36,10 @@ export function Graph(props: GraphProps) {
     chart()?.duration(400);
   });
 
+  createEffect(() => {
+    chart()?.layout(props.rotation()).render();
+  });
+
   onMount(() => {
     const chart = new OrgChart<AstNode>();
     const n = node();
@@ -48,6 +54,7 @@ export function Graph(props: GraphProps) {
     };
 
     chart.container(n as any as string) // Typings says only string is accepted, but it can also accept HTMLElement :/ 
+        .layout("left")
         .svgHeight(n?.clientHeight ?? window.innerHeight - 100)
         .svgWidth(n?.clientWidth ?? window.innerWidth / 2)
         .setActiveNodeCentered(false)
@@ -85,6 +92,9 @@ export function Graph(props: GraphProps) {
       <Button onclick={() => {
         chart()?.expandAll()
       }} label="Expand All" />
+      <Button onclick={() => {
+        props.rotate();
+      }} label="Rotate" />
     </aside>
   </article>);
 }
