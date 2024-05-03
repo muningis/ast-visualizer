@@ -3,7 +3,7 @@ import { AnyNode } from "acorn"
 
 export type AstGroup = "Statement" | "Expression" | "Pattern" | "ModuleDeclaration"
 
-export const astGroupByType: Partial<Record<(AnyNode | VariableDeclarator)["type"], AstGroup>> = {
+export const astGroupByType: Record<(AnyNode | VariableDeclarator)["type"], AstGroup> = {
   "ExpressionStatement": "Statement",
   "BlockStatement": "Statement",
   "EmptyStatement": "Statement",
@@ -47,6 +47,7 @@ export const astGroupByType: Partial<Record<(AnyNode | VariableDeclarator)["type
   "ArrowFunctionExpression": "Expression",
   "YieldExpression": "Expression",
   "TemplateLiteral": "Expression",
+  "TemplateElement": "Expression",
   "TaggedTemplateExpression": "Expression",
   "ClassExpression": "Expression",
   "MetaProperty": "Expression",
@@ -65,5 +66,19 @@ export const astGroupByType: Partial<Record<(AnyNode | VariableDeclarator)["type
   "ExportDefaultDeclaration": "ModuleDeclaration",
   "ExportAllDeclaration": "ModuleDeclaration",
 
-
+  "CatchClause": "Expression",
+  ClassBody: "Expression",
+  ExportSpecifier: "ModuleDeclaration",
+  ImportDefaultSpecifier: "ModuleDeclaration",
+  ImportNamespaceSpecifier: "ModuleDeclaration",
+  ImportSpecifier: "ModuleDeclaration",
+  MethodDefinition: "Expression",
+  PrivateIdentifier: "Statement",
+  Program: "Expression",
+  Property: "Expression",
+  PropertyDefinition: "Expression",
+  SpreadElement: "Expression",
+  StaticBlock: "Expression",
+  Super: 'Expression',
+  SwitchCase: "Expression",
 }

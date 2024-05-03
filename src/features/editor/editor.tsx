@@ -2,9 +2,16 @@ import { codeToHtml } from "shiki/bundle/web";
 import { Accessor, createSignal, onMount } from "solid-js";
 import { createDebounce } from "../../lib/debounce.mts";
 
-const INITIAL_CONTENT = `const foo = "bar";
+const INITIAL_CONTENT = `const bar = "bar";
+const five = 5;
+const no = false;
+const arr = [bar, "bar", 1, false];
+const arr2 = [...arr];
+const obj = { foo: "bar" };
+const obj2 = { ...obj };
 const a = 1 > 2 ? 3 : 4;
-function hello() {
+
+function hello({ foo, ...rest }, ...args) {
   const greeting = "world!";
   return \`Hello, \${greeting}!\`;
 }

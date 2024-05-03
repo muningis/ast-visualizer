@@ -2,7 +2,7 @@ import { parse } from "acorn";
 import { Accessor, Setter, createEffect, createMemo, createSignal, onMount } from "solid-js";
 import { flattenData } from "../features/ast/hierachy-builder.mts";
 import { OrgChart } from "d3-org-chart";
-import { NodeCard } from "./node_card";
+import { NodeCard } from "./node_card.mts";
 import { AstNode } from "../features/ast/types.mts";
 import { Button } from "./atoms/button";
 
@@ -56,7 +56,10 @@ export function Graph(props: GraphProps) {
         .data(nodes())
         .nodeWidth(() => 150)
         .nodeHeight(() => 66)
-        .compactMarginBetween(() => 40)
+        .childrenMargin(() => 80)
+        .siblingsMargin(() => 10)
+        .neighbourMargin(() => 20)
+        // .compactMarginBetween(() => 40)
         .nodeContent((node) => {
           return NodeCard(node.data)
         })
