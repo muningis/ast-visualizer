@@ -249,7 +249,7 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
     case "ParenthesizedExpression": return `Not Yet Implemented for ${node.type}`
     case "PrivateIdentifier": return `Not Yet Implemented for ${node.type}`
     case "Program": return node.sourceType;
-    case "Property": return `Not Yet Implemented for ${node.type}`
+    case "Property": return `${getContent(node.key)} = ${getContent(node.value)}`;
     case "PropertyDefinition": return `Not Yet Implemented for ${node.type}`
     case "RestElement": return `...${getContent(node.argument)}`
     case "ReturnStatement": return `return`;
