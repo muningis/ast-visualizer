@@ -31,7 +31,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
     case 'BreakStatement':
       return [baseNode];
     case "CallExpression":
-      return [baseNode]
+      return [baseNode, ...visitNodes(node.arguments, id)]
     case "CatchClause":
       return [baseNode, ...visitNode(node.body, id)];
     case "ChainExpression":
@@ -130,7 +130,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
       /** @todo */
       return [baseNode, ...visitNodes([
         node.key,
-        ...(node.value.type !== "Identifier" ? [node.value] : [])
+        node.value
       ], id)];
     case "PropertyDefinition":
       return [baseNode, ...(node.value ? visitNode(node.value, id) : [])];

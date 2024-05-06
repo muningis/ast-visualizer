@@ -17,7 +17,7 @@ function hello({ foo, ...rest }, ...args) {
 }
 
 if (true) {
-  console.log("hello");
+  console.log(hello({ foo: bar, five, ...obj2 }, ...arr2));
 }
 `;
 
