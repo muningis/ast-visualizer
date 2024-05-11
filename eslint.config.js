@@ -1,10 +1,13 @@
 import js from "@eslint/js";
 import solid from "eslint-plugin-solid/configs/typescript.js";
 import * as tsParser from "@typescript-eslint/parser";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import globals from "globals";
+
 
 export default [
   js.configs.recommended,
+  eslintPluginPrettierRecommended,
   {
     files: ["src/**/*.{ts,tsx,mts}"],
     ...solid,

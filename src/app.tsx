@@ -20,14 +20,14 @@ function App() {
         <Editor setProgram={setProgram} editorOpen={editorOpen} />
         <Graph program={program()} editorOpen={editorOpen} toggleEditor={setEditorOpen} rotate={rotate} rotation={rotation} />
       </main>
-      <footer class="h-10 bg-slate-300 py-2 px-4">
-        Built with: 
-        <Link href="https://www.solidjs.com/" label="Solid" />, 
-        <Link href="https://d3js.org" label="d3" />, 
-        <Link href="https://github.com/acornjs/acorn" label="Acorn" />, 
-        <Link href="https://tailwindcss.com/" label="Tailwind" />, 
-        <Link href="https://vitejs.dev/" label="Vite" />, 
-        <Link href="https://bun.sh/" label="Bun" />, 
+      <footer class="h-10 bg-slate-300 py-2 px-4 flex">
+        <span>Built with:</span>
+        <Link href="https://www.solidjs.com/" label="Solid" />,
+        <Link href="https://d3js.org" label="d3" />,
+        <Link href="https://github.com/acornjs/acorn" label="Acorn" />,
+        <Link href="https://tailwindcss.com/" label="Tailwind" />,
+        <Link href="https://vitejs.dev/" label="Vite" />,
+        <Link href="https://bun.sh/" label="Bun" />,
         <Link href="https://shiki.style/" label="Shiki" />
         <span> | </span>
         <span>commit hash: {import.meta.env['__COMMIT_HASH__']}</span>

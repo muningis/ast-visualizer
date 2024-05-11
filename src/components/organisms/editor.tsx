@@ -37,13 +37,13 @@ export function Editor(props: EditorProps) {
     setHighlighted(() => html);
   })
   return (<article class="relative font-mono overflow-hidden">
-    <pre class="w-full h-full absolute l-0 r-0 b-t- t-0"> 
+    <pre class="w-full h-full absolute l-0 r-0 b-t- t-0">
       <code
         data-id="editor"
         class="whitespace-pre-wrap focus:outline-none w-full h-full [&>pre.shiki]:h-full [&>pre.shiki]:w-full [&>pre.shiki]:p-4"
         // eslint-disable-next-line solid/no-innerhtml
         innerHTML={highlighted()}
-       />
+      />
     </pre>
     <textarea class="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4 pl-14 resize-none" onInput={async (e) => {
       setProgram(e.target.value);

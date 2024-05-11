@@ -60,7 +60,7 @@ export function visitNode(node: AnyNode | VariableDeclarator | null | undefined,
     case "EmptyStatement":
       return [baseNode];
     case "ExportAllDeclaration":
-      return [baseNode, ...(node.exported ? visitNode(node.exported, id): [])];
+      return [baseNode, ...(node.exported ? visitNode(node.exported, id) : [])];
     case "ExportDefaultDeclaration":
       return [baseNode, ...visitNode(node.declaration, id)];
     case "ExportNamedDeclaration":
@@ -261,12 +261,11 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
     case "SwitchStatement": return `Not Yet Implemented for ${node.type}`
     case "TaggedTemplateExpression": return `Not Yet Implemented for ${node.type}`
     case "TemplateElement": return node.value.raw;
-    case "TemplateLiteral": return `\`${
-      [...node.quasis, ...node.expressions]
+    case "TemplateLiteral": return `\`${[...node.quasis, ...node.expressions]
         .sort((a, b) => a.start - b.start)
         .flatMap(node => node.type === "TemplateElement" ? getContent(node) : `$\{${getContent(node)}}`)
         .join("")
-    }\``;
+      }\``;
     case "ThisExpression": return `Not Yet Implemented for ${node.type}`
     case "ThrowStatement": return `Not Yet Implemented for ${node.type}`
     case "TryStatement": return `Not Yet Implemented for ${node.type}`
@@ -281,7 +280,7 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
         case "ArrayExpression": return `${getName(node.id)} = ${getContent(init)}`;
         case "ArrowFunctionExpression": return `<i>ArrowFnExpr</i>`;
         case "AssignmentExpression": return `${init.left} ${init.right}`;
-        case "AwaitExpression": return`${getName(node.id)} = ${getContent(init)}`;
+        case "AwaitExpression": return `${getName(node.id)} = ${getContent(init)}`;
         case "BinaryExpression": return `${getName(node.id)} = ${getContent(init)}`;
         case "Identifier": return `${getName(node.id)} = ${init.name}`;
         case "ObjectExpression": return `${getName(node.id)} = ${node.init ? getContent(node.init) : null}`

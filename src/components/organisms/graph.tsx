@@ -54,34 +54,34 @@ export function Graph(props: GraphProps) {
     };
 
     chart.container(n as any as string) // Typings says only string is accepted, but it can also accept HTMLElement :/ 
-        .layout("left")
-        .svgHeight(n?.clientHeight ?? window.innerHeight - 100)
-        .svgWidth(n?.clientWidth ?? window.innerWidth / 2)
-        .setActiveNodeCentered(false)
-        .scaleExtent([.25, 2])
-        .compact(false)
-        .data(nodes())
-        .nodeWidth(() => 150)
-        .nodeHeight(() => 66)
-        .childrenMargin(() => 80)
-        .siblingsMargin(() => 10)
-        .neighbourMargin(() => 20)
-        // .compactMarginBetween(() => 40)
-        .nodeContent((node) => {
-          return NodeCard(node.data)
-        })
-        .expandAll()
-        .render();
+      .layout("left")
+      .svgHeight(n?.clientHeight ?? window.innerHeight - 100)
+      .svgWidth(n?.clientWidth ?? window.innerWidth / 2)
+      .setActiveNodeCentered(false)
+      .scaleExtent([.25, 2])
+      .compact(false)
+      .data(nodes())
+      .nodeWidth(() => 150)
+      .nodeHeight(() => 66)
+      .childrenMargin(() => 80)
+      .siblingsMargin(() => 10)
+      .neighbourMargin(() => 20)
+      // .compactMarginBetween(() => 40)
+      .nodeContent((node) => {
+        return NodeCard(node.data)
+      })
+      .expandAll()
+      .render();
 
     setChart(() => chart);
-    
+
     document.querySelector("[data-id=\"main\"]")?.addEventListener("transitionend", () => {
       updateSVGSize();
     });
   });
 
-  return (<article classList={{"relative": true}}>
-    <div classList={{"w-full h-full absolute": true, "cursor-grabbing": false, "cursor-grab": true}} ref={setNode} />
+  return (<article classList={{ "relative": true }}>
+    <div classList={{ "w-full h-full absolute": true, "cursor-grabbing": false, "cursor-grab": true }} ref={setNode} />
     <aside class="absolute top-4 left-4 flex gap-2">
       <Button onclick={() => {
         props.toggleEditor(o => !o);
