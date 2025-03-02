@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
-import tailwind from "tailwindcss";
-import solidPlugin from 'vite-plugin-solid';
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react';
+import tsconfigPaths from 'vite-tsconfig-paths'
+
 import cp from "child_process";
 
 const commitHash = cp
@@ -8,12 +10,7 @@ const commitHash = cp
     .toString();
 
 export default defineConfig({
-  plugins: [solidPlugin()],
-  css: {
-    postcss: {
-      plugins: [tailwind]
-    }
-  },
+  plugins: [react(), tailwindcss(), tsconfigPaths()],
   define: {
     'import.meta.env.__COMMIT_HASH__': JSON.stringify(commitHash)
   }

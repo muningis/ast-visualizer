@@ -1,39 +1,43 @@
-import { render } from "solid-js/web";
+import { createRoot } from "react-dom/client";
 import { Editor } from "./components/organisms/editor";
 import { Graph } from "./components/organisms/graph";
-import { createSignal } from "solid-js";
-import "./style.css"
+import "./style.css";
 import { Link } from "./components/atoms/link";
+import { useAtomValue } from "./libs/atom.mts";
+import { editorOpenAtom } from "./features/editor/atom";
 
 function App() {
-  const [program, setProgram] = createSignal("");
-  const [editorOpen, setEditorOpen] = createSignal(true);
-  const [rotation, setRotation] = createSignal<"left" | "top">("left");
-  const rotate = () => setRotation(rotation => rotation === "left" ? "top" : "left");
+  const editorOpen = useAtomValue(editorOpenAtom);
   return (
-    <div class="flex flex-col w-screen h-screen">
-      <main data-id="main" classList={{
-        "grid flex-1 max-h-[calc(100%-2rem)] transition-all": true,
-        "grid-cols-editor-collapsed": !editorOpen(),
-        "grid-cols-editor-open": editorOpen()
-      }}>
-        <Editor setProgram={setProgram} editorOpen={editorOpen} />
-        <Graph program={program()} editorOpen={editorOpen} toggleEditor={setEditorOpen} rotate={rotate} rotation={rotation} />
+    <div className="flex flex-col w-screen h-screen">
+      <main
+        data-id="main"
+        className={`
+          grid flex-1 max-h-[calc(100%-2rem)] transition-all
+          ${!editorOpen ? "grid-cols-editor-collapsed" : "grid-cols-editor-open"}
+        `}
+      >
+        <Editor />
+        <Graph />
       </main>
-      <footer class="h-10 bg-slate-300 py-2 px-4 flex">
+      <footer className="h-10 bg-slate-300 py-2 px-4 flex space-x-2">
         <span>Built with:</span>
-        <Link href="https://www.solidjs.com/" label="Solid" />,
-        <Link href="https://d3js.org" label="d3" />,
-        <Link href="https://github.com/acornjs/acorn" label="Acorn" />,
-        <Link href="https://tailwindcss.com/" label="Tailwind" />,
-        <Link href="https://vitejs.dev/" label="Vite" />,
-        <Link href="https://bun.sh/" label="Bun" />,
+        <Link href="https://reactjs.org/" label="React" />
+        <Link href="https://d3js.org" label="d3" />
+        <Link href="https://github.com/acornjs/acorn" label="Acorn" />
+        <Link href="https://tailwindcss.com/" label="Tailwind" />
+        <Link href="https://vitejs.dev/" label="Vite" />
+        <Link href="https://bun.sh/" label="Bun" />
         <Link href="https://shiki.style/" label="Shiki" />
         <span> | </span>
-        <span>commit hash: {import.meta.env['__COMMIT_HASH__']}</span>
+        <span>commit hash: {import.meta.env["__COMMIT_HASH__"]}</span>
       </footer>
     </div>
   );
 }
 
-render(() => <App />, document.querySelector("div[data-id='app']")!);
+const rootElement = document.querySelector("div[data-id='app']");
+if (rootElement) {
+  const root = createRoot(rootElement);
+  root.render(<App />);
+}

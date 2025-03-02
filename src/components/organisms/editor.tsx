@@ -1,54 +1,53 @@
+import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { codeToHtml } from "shiki/bundle/web";
-import { Accessor, createSignal, onMount } from "solid-js";
-import { createDebounce } from "../../lib/debounce.mts";
+import { useAtom, useResetAtom } from "@/libs/atom.mjs";
+import { editorContentAtom } from "@/features/editor/atom";
 
-const INITIAL_CONTENT = `const bar = "bar";
-const five = 5;
-const no = false;
-const arr = [bar, "bar", 1, false];
-const arr2 = [...arr];
-const obj = { foo: "bar" };
-const obj2 = { ...obj };
-const a = 1 > 2 ? 3 : 4;
+export function Editor() {
+  const [editorContent, setEditorContent] = useAtom(editorContentAtom);
+  const resetEditorContent = useResetAtom(editorContentAtom);
+  const [highlighted, setHighlighted] = useState("");
 
-function hello({ foo, ...rest }, ...args) {
-  const greeting = "world!";
-  return \`Hello, \${greeting}!\`;
-}
+  useEffect(() => {
+    resetEditorContent();
 
-if (true) {
-  console.log(hello({ foo: bar, five, ...obj2 }, ...arr2));
-}
-`;
+    const initHighlight = async () => {
+      const html = await codeToHtml(editorContent, {
+        lang: "js",
+        theme: "dracula-soft",
+      });
+      setHighlighted(html);
+    };
 
-interface EditorProps {
-  setProgram(_value: string): void
-  editorOpen: Accessor<boolean>;
-}
+    initHighlight();
+  }, []);
 
-export function Editor(props: EditorProps) {
-  onMount(() => {
-    props.setProgram(INITIAL_CONTENT);
-  })
-  const setProgram = createDebounce((value: string) => props.setProgram(value), 1000);
-  const [highlighted, setHighlighted] = createSignal("");
-  onMount(async () => {
-    const html = await codeToHtml(INITIAL_CONTENT, { lang: "js", theme: "dracula-soft" });
-    setHighlighted(() => html);
-  })
-  return (<article class="relative font-mono overflow-hidden">
-    <pre class="w-full h-full absolute l-0 r-0 b-t- t-0">
-      <code
-        data-id="editor"
-        class="whitespace-pre-wrap focus:outline-none w-full h-full [&>pre.shiki]:h-full [&>pre.shiki]:w-full [&>pre.shiki]:p-4"
-        // eslint-disable-next-line solid/no-innerhtml
-        innerHTML={highlighted()}
+  const handleInput = useCallback(
+    async (e: ChangeEvent<HTMLTextAreaElement>) => {
+      setEditorContent(e.target.value);
+      const html = await codeToHtml(e.target.value, {
+        lang: "js",
+        theme: "dracula-soft",
+      });
+      setHighlighted(html);
+    },
+    [setEditorContent],
+  );
+
+  return (
+    <article className="relative font-mono overflow-hidden">
+      <pre className="w-full h-full absolute l-0 r-0 b-t- t-0">
+        <code
+          data-id="editor"
+          className="whitespace-pre-wrap focus:outline-none w-full h-full [&>pre.shiki]:h-full [&>pre.shiki]:w-full [&>pre.shiki]:p-4"
+          dangerouslySetInnerHTML={{ __html: highlighted }}
+        />
+      </pre>
+      <textarea
+        className="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4 pl-14 resize-none"
+        onInput={handleInput}
+        defaultValue={editorContent}
       />
-    </pre>
-    <textarea class="bg-transparent text-transparent absolute w-full h-full l-0 r-0 b-t- t-0 caret-white text-base normal-nums p-4 pl-14 resize-none" onInput={async (e) => {
-      setProgram(e.target.value);
-      const html = await codeToHtml(e.target.value, { lang: "js", theme: "dracula-soft" });
-      setHighlighted(() => html);
-    }}>{INITIAL_CONTENT}</textarea>
-  </article>)
+    </article>
+  );
 }
