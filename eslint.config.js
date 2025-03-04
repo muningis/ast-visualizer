@@ -2,16 +2,17 @@ import js from "@eslint/js";
 import * as tsParser from "@typescript-eslint/parser";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import globals from "globals";
-
+import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   js.configs.recommended,
   eslintPluginPrettierRecommended,
+  reactRefresh.configs.vite,
   {
     files: ["src/**/*.{ts,tsx,mts}"],
     languageOptions: {
       globals: {
-        ...globals.browser
+        ...globals.browser,
       },
       parser: tsParser,
       parserOptions: {

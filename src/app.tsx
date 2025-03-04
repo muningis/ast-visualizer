@@ -1,7 +1,6 @@
-import { createRoot } from "react-dom/client";
+import "./style.css";
 import { Editor } from "./components/organisms/editor";
 import { Graph } from "./components/organisms/graph";
-import "./style.css";
 import { Link } from "./components/atoms/link";
 import { useAtomValue } from "./libs/atom.mts";
 import { editorOpenAtom } from "./features/editor/atom";
@@ -14,7 +13,7 @@ function App() {
         data-id="main"
         className={`
           grid flex-1 max-h-[calc(100%-2rem)] transition-all
-          ${!editorOpen ? "grid-cols-editor-collapsed" : "grid-cols-editor-open"}
+          ${!editorOpen ? "grid-cols-(--editor-collapsed)" : "grid-cols-(--editor-open)"}
         `}
       >
         <Editor />
@@ -36,8 +35,4 @@ function App() {
   );
 }
 
-const rootElement = document.querySelector("div[data-id='app']");
-if (rootElement) {
-  const root = createRoot(rootElement);
-  root.render(<App />);
-}
+export { App };
