@@ -1,7 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source "index.html";
+@source "src/**/*.tsx";
+@source "src/**/*.mts";
 
+:root {
+  --editor-open: 50% 50%;
+  --editor-collapsed: 0 100%;
+}
 
 .shiki code {
   counter-reset: step;

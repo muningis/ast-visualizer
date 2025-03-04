@@ -5,4 +5,4 @@ export interface AstNode {
   parentId: string;
   type: (AnyNode | VariableDeclarator)["type"];
   content: string;
-};
+}
