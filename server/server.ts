@@ -2,7 +2,7 @@ import { BunFile, file, serve } from "bun";
 import { join } from "path";
 import { CompressionStream } from "./CompressionStream";
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const shouldCompress = (req: Request) => {
   const acceptEncoding = req.headers.get("Accept-Encoding");
