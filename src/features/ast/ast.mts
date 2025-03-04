@@ -69,6 +69,7 @@ export const astGroupByType: Record<
   AssignmentPattern: "Pattern",
 
   ImportDeclaration: "ModuleDeclaration",
+  ImportAttribute: "Expression",
   ExportNamedDeclaration: "ModuleDeclaration",
   ExportDefaultDeclaration: "ModuleDeclaration",
   ExportAllDeclaration: "ModuleDeclaration",

@@ -28,8 +28,6 @@ function App() {
         <Link href="https://vitejs.dev/" label="Vite" />
         <Link href="https://bun.sh/" label="Bun" />
         <Link href="https://shiki.style/" label="Shiki" />
-        <span> | </span>
-        <span>commit hash: {import.meta.env["__COMMIT_HASH__"]}</span>
       </footer>
     </div>
   );
