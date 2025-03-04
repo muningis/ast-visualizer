@@ -1,0 +1,25 @@
+networks:
+  traefik-net:
+    external: true
+
+services:
+  astvisualizer:
+    build:
+      dockerfile: Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.astvisualizer.rule=Host(`astvisualizer.dev`)"
+      - "traefik.http.routers.astvisualizer.entrypoints=websecure"
+      - "traefik.http.routers.astvisualizer.tls=true"
+      - "traefik.http.routers.astvisualizer.tls.certresolver=myresolver"
+      - "traefik.http.services.astvisualizer.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 2s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
