@@ -277,6 +277,8 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
       return `if (${getContent(node.test)})`;
     case "ImportDeclaration":
       return `Not Yet Implemented for ${node.type}`;
+    case "ImportAttribute":
+      return `Not Yet Implemented for ${node.type}`;
     case "ImportDefaultSpecifier":
       return `Not Yet Implemented for ${node.type}`;
     case "ImportExpression":
