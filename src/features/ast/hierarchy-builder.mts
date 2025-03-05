@@ -209,18 +209,18 @@ export function visitNode(
   }
 }
 
-const getContent = (node: AnyNode | VariableDeclarator): string => {
+export const getContent = (node: AnyNode | VariableDeclarator): string => {
   switch (node.type) {
     case "ArrayExpression":
       return `[${node.elements.map((e) => (e ? getContent(e!) : null)).join(", ")}]`;
     case "ArrayPattern":
-      return `Not Yet Implemented for ${node.type}`;
+      return `[${node.elements.map((e) => (e ? getContent(e!) : null)).join(", ")}]`;
     case "ArrowFunctionExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.async ? "async " : ""}(${node.params.map((p) => getContent(p)).join(", ")}) => ${node.body.type === "BlockStatement" ? "{...}" : getContent(node.body)}`;
     case "AssignmentExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.left)} ${node.operator} ${getContent(node.right)}`;
     case "AssignmentPattern":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.left)} = ${getContent(node.right)}`;
     case "AwaitExpression":
       return `await ${getContent(node.argument)}`;
     case "BinaryExpression":
@@ -228,79 +228,79 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
     case "BlockStatement":
       return "{/* ... */}";
     case "BreakStatement":
-      return `break`;
+      return `break${node.label ? ` ${getContent(node.label)}` : ""}`;
     case "CallExpression":
-      return `${getContent(node.callee)}()`;
+      return `${getContent(node.callee)}(${node.arguments.map((arg) => getContent(arg)).join(", ")})`;
     case "CatchClause":
-      return `Not Yet Implemented for ${node.type}`;
+      return `catch (${node.param ? getContent(node.param) : ""}) {...}`;
     case "ChainExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return getContent(node.expression);
     case "ClassBody":
-      return `Not Yet Implemented for ${node.type}`;
+      return `{ /* class members */ }`;
     case "ClassDeclaration":
-      return `Not Yet Implemented for ${node.type}`;
+      return `class ${node.id ? node.id.name : "Anonymous"}${node.superClass ? ` extends ${getContent(node.superClass)}` : ""} {...}`;
     case "ClassExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `class${node.id ? ` ${node.id.name}` : ""}${node.superClass ? ` extends ${getContent(node.superClass)}` : ""} {...}`;
     case "ConditionalExpression":
       return `${getContent(node.test)} ? ${getContent(node.consequent)} : ${getContent(node.alternate)}`;
     case "ContinueStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `continue${node.label ? ` ${getContent(node.label)}` : ""}`;
     case "DebuggerStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `debugger`;
     case "DoWhileStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `do {...} while (${getContent(node.test)})`;
     case "EmptyStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `;`;
     case "ExportAllDeclaration":
-      return `Not Yet Implemented for ${node.type}`;
+      return `export * ${node.exported ? `as ${getContent(node.exported)}` : ""} from ${node.source.raw}`;
     case "ExportDefaultDeclaration":
-      return `Not Yet Implemented for ${node.type}`;
+      return `export default ${getContent(node.declaration)}`;
     case "ExportNamedDeclaration":
-      return `Not Yet Implemented for ${node.type}`;
+      return `export ${node.declaration ? getContent(node.declaration) : `{${node.specifiers.map((s) => getContent(s)).join(", ")}}`}${node.source ? ` from ${node.source.raw}` : ""}`;
     case "ExportSpecifier":
-      return `"Not Yet Implemented"`;
+      return `${getContent(node.local)}${node.exported.type === "Identifier" && node.local.type === "Identifier" && node.exported.name !== node.local.name ? ` as ${getContent(node.exported)}` : ""}`;
     case "ExpressionStatement":
       return `ExprStmt`;
     case "ForInStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `for (${getContent(node.left)} in ${getContent(node.right)}) {...}`;
     case "ForOfStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `for (${node.await ? "await " : ""}${getContent(node.left)} of ${getContent(node.right)}) {...}`;
     case "ForStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `for (${node.init ? getContent(node.init) : ""}; ${node.test ? getContent(node.test) : ""}; ${node.update ? getContent(node.update) : ""}) {...}`;
     case "FunctionDeclaration":
       return `${node.async ? "async " : ""}function ${node.id?.name ?? "AnonymousFunction"}(${node.params.map((p) => getContent(p)).join(", ")}) {}`;
     case "FunctionExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.async ? "async " : ""}function${node.id ? ` ${node.id.name}` : ""}(${node.params.map((p) => getContent(p)).join(", ")}) {...}`;
     case "Identifier":
       return node.name;
     case "IfStatement":
       return `if (${getContent(node.test)})`;
     case "ImportDeclaration":
-      return `Not Yet Implemented for ${node.type}`;
+      return `import ${node.specifiers.length ? `${node.specifiers.map((s) => getContent(s)).join(", ")} from ` : ""}${node.source.raw}`;
     case "ImportAttribute":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.key)}: ${getContent(node.value)}`;
     case "ImportDefaultSpecifier":
-      return `Not Yet Implemented for ${node.type}`;
+      return getContent(node.local);
     case "ImportExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `import(${getContent(node.source)})`;
     case "ImportNamespaceSpecifier":
-      return `Not Yet Implemented for ${node.type}`;
+      return `* as ${getContent(node.local)}`;
     case "ImportSpecifier":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.imported)}${node.imported.type === "Identifier" && node.local.type === "Identifier" && node.imported.name !== node.local.name ? ` as ${getContent(node.local)}` : ""}`;
     case "LabeledStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.label)}: ${getContent(node.body)}`;
     case "Literal":
       return node.raw ?? "";
     case "LogicalExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.left)} ${node.operator} ${getContent(node.right)}`;
     case "MemberExpression":
       return `${getContent(node.object)}.${getContent(node.property)}`;
     case "MetaProperty":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.meta)}.${getContent(node.property)}`;
     case "MethodDefinition":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.static ? "static " : ""}${node.kind} ${getContent(node.key)}(${node.value.params.map((p) => getContent(p)).join(", ")}) {...}`;
     case "NewExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `new ${getContent(node.callee)}(${node.arguments.map((arg) => getContent(arg)).join(", ")})`;
     case "ObjectExpression": {
       const firstMember = node.properties.at(0);
       switch (firstMember?.type) {
@@ -309,7 +309,7 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
         case "SpreadElement":
           return `{ ${getContent(firstMember)} }`;
       }
-      return "";
+      return "{}";
     }
     case "ObjectPattern": {
       const firstMember = node.properties.at(0);
@@ -319,36 +319,36 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
         case "RestElement":
           return `{ ${getContent(firstMember)} }`;
       }
-      return "";
+      return "{}";
     }
     case "ParenthesizedExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `(${getContent(node.expression)})`;
     case "PrivateIdentifier":
-      return `Not Yet Implemented for ${node.type}`;
+      return `#${node.name}`;
     case "Program":
       return node.sourceType;
     case "Property":
       return `${getContent(node.key)} = ${getContent(node.value)}`;
     case "PropertyDefinition":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.static ? "static " : ""}${getContent(node.key)}${node.value ? ` = ${getContent(node.value)}` : ""}`;
     case "RestElement":
       return `...${getContent(node.argument)}`;
     case "ReturnStatement":
-      return `return`;
+      return `return${node.argument ? ` ${getContent(node.argument)}` : ""}`;
     case "SequenceExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return node.expressions.map((expr) => getContent(expr)).join(", ");
     case "SpreadElement":
       return `...${getContent(node.argument)}`;
     case "StaticBlock":
-      return `Not Yet Implemented for ${node.type}`;
+      return `static { /* ... */ }`;
     case "Super":
-      return `Not Yet Implemented for ${node.type}`;
+      return `super`;
     case "SwitchCase":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.test ? `case ${getContent(node.test)}` : "default"}: /* ... */`;
     case "SwitchStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `switch (${getContent(node.discriminant)}) { /* cases */ }`;
     case "TaggedTemplateExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${getContent(node.tag)}\`${getContent(node.quasi)}\``;
     case "TemplateElement":
       return node.value.raw;
     case "TemplateLiteral":
@@ -361,15 +361,15 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
         )
         .join("")}\``;
     case "ThisExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `this`;
     case "ThrowStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `throw ${getContent(node.argument)}`;
     case "TryStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `try {...}${node.handler ? ` ${getContent(node.handler)}` : ""}${node.finalizer ? ` finally {...}` : ""}`;
     case "UnaryExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.prefix ? node.operator : ""}${getContent(node.argument)}${!node.prefix ? node.operator : ""}`;
     case "UpdateExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `${node.prefix ? node.operator : ""}${getContent(node.argument)}${!node.prefix ? node.operator : ""}`;
     case "VariableDeclaration":
       return node.kind;
     case "VariableDeclarator": {
@@ -394,15 +394,15 @@ const getContent = (node: AnyNode | VariableDeclarator): string => {
         case "ObjectExpression":
           return `${getName(node.id)} = ${node.init ? getContent(node.init) : null}`;
         default:
-          return `Not Yet Implemented for ${node.init?.type}`;
+          return `${getName(node.id)}${init ? ` = ${getContent(init)}` : ""}`;
       }
     }
     case "WhileStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `while (${getContent(node.test)}) {...}`;
     case "WithStatement":
-      return `Not Yet Implemented for ${node.type}`;
+      return `with (${getContent(node.object)}) {...}`;
     case "YieldExpression":
-      return `Not Yet Implemented for ${node.type}`;
+      return `yield${node.delegate ? "*" : ""}${node.argument ? ` ${getContent(node.argument)}` : ""}`;
   }
 };
 

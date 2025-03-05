@@ -23,8 +23,8 @@ serve({
 
     if (filePath === "/") filePath = "/index.html";
     const headers = new Headers();
-    if (CACHE_EXTENSIONS.some(ext => filePath.endsWith(ext))) {
-      headers.set("Cache-Control", CACHE_CONTROL);
+    if (filePath.endsWith(".js") || filePath.endsWith(".css") || filePath.endsWith(".svg")) {
+      headers.set("Cache-Control", "public, max-age=31536000, immutable");
     }
 
     try {
