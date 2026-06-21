@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Terraform (.tf/{infra,app})
+secrets.auto.tfvars
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+.terraform/
+.terraform.lock.hcl
+tfplan
+
+# Local secrets (AWS S3 state, CF token, ghcr creds)
+.env
