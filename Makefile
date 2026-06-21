@@ -1,4 +1,4 @@
-.PHONY: help build push release deploy infra\:init infra\:plan infra\:apply infra\:deploy app\:init app\:plan app\:apply app\:deploy
+.PHONY: help build push release deploy app\:init app\:plan app\:apply app\:deploy
 
 -include .env
 export
@@ -11,19 +11,16 @@ export KUBE_CONFIG_PATH ?= $(GARAZAS_DIR)/kubeconfig
 
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 
-TF_INFRA := terraform -chdir=.tf/infra
-TF_APP   := terraform -chdir=.tf/app
+TF_APP := terraform -chdir=.tf/app
 
 help:
-	@echo "Frequent app deploys (.tf/app — Deployment/Service/Gateway/VirtualService):"
-	@echo "  make release         build + push + deploy app (full local flow)"
-	@echo "  make deploy          app terraform only (alias for app:deploy)"
-	@echo "  make app:plan        plan app workspace (IMAGE_TAG=$(IMAGE_TAG))"
-	@echo "  make app:apply       apply the saved app plan"
+	@echo "Single-stage app (.tf/app — edge + workload modules):"
+	@echo "  make release         build + push + deploy (full local flow)"
+	@echo "  make deploy          terraform apply only (alias for app:deploy)"
+	@echo "  make app:plan        plan (IMAGE_TAG=$(IMAGE_TAG))"
+	@echo "  make app:apply       apply the saved plan"
 	@echo ""
-	@echo "Rare infra changes (.tf/infra — DNS/TLS/origin cert/tls secret):"
-	@echo "  make infra:plan      plan infra workspace"
-	@echo "  make infra:apply     apply the saved infra plan"
+	@echo "Cutover: set stage=production in .tf/app/variables.tf (or -var) then apply."
 	@echo ""
 	@echo "IMAGE_TAG:   $(IMAGE_TAG)"
 	@echo "KUBECONFIG:  $(KUBECONFIG)"
@@ -38,18 +35,6 @@ push:
 	@echo "$(GITHUB_TOKEN)" | docker login $(REGISTRY) -u $(GITHUB_USER) --password-stdin
 	docker push $(REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG)
 	docker push $(REGISTRY)/$(IMAGE_NAME):latest
-
-infra\:init:
-	$(TF_INFRA) init
-
-infra\:plan:
-	$(TF_INFRA) init && $(TF_INFRA) plan -out=tfplan
-
-infra\:apply:
-	$(TF_INFRA) apply tfplan
-
-infra\:deploy:
-	$(MAKE) infra:plan infra:apply
 
 app\:init:
 	$(TF_APP) init
