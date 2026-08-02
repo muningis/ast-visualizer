@@ -10,6 +10,6 @@ variable "cloudflare_api_token" {
 
 variable "stage" {
   type        = string
-  default     = "staging"
+  default     = "production"
   description = "staging = serve only the v2 host; production = manage all hosts' DNS (cutover)"
 }
