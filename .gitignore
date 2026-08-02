@@ -26,10 +26,8 @@ dist-ssr
 # Terraform (.tf/{infra,app})
 secrets.auto.tfvars
 *.tfstate
-*.tfstate.backup
-*.tfstate.*.backup
+*.tfstate.*
 .terraform/
-.terraform.lock.hcl
 tfplan
 
 # Local secrets (AWS S3 state, CF token, ghcr creds)
